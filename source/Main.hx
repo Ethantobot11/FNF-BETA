@@ -29,19 +29,19 @@ class Main
         var plgResult = PLGLDR.init();
         if (plgResult == 0) {
             trace("Luma3DS Plugin Loader initialized successfully.");
-            PLGLDR.displayMessage("Deltarune 3DS", "Luma3DS Plugin Loader active!");
+            PLGLDR.displayMessage("FNF 3DS", "Luma3DS Plugin Loader active!");
         } else {
             trace("Luma3DS Plugin Loader not available (Result: " + plgResult + ")");
         }
         
-        trace("Starting Deltarune 3DS Application...");
+        trace("Starting FNF 3DS Application...");
 
-        AchievementManager.unlock("play_DELTARUNE_3DS");
+        //AchievementManager.unlock("play_DELTARUNE_3DS");
 
-        CitroGame.start(new LoadingState());
+        CitroGame.start(new TitleState());
         
         #else
-        LfEngine.initEngine("Deltarune", DRC, new WiiUMainMenuState());
+        LfEngine.initEngine("FNF 3DS", DRC, new WiiUMainMenuState());
         #end
     }
 }

@@ -2,6 +2,14 @@ import os
 import subprocess
 import shutil
 import xml.etree.ElementTree as ET
+import math
+
+try:
+    from PIL import Image
+    HAS_PILLOW = True
+except ImportError:
+    HAS_PILLOW = False
+    print("WARNING: Pillow not found. Install it via 'pip install Pillow' to fix texture dimension errors.")
 
 def get_tool_path(tool_name: str) -> str:
     tool_path = shutil.which(tool_name)
@@ -11,6 +19,9 @@ def get_tool_path(tool_name: str) -> str:
     win_path = f"C:\\devkitPro\\tools\\bin\\{tool_name}.exe"
     if os.path.exists(win_path): return win_path
     return tool_name
+
+def next_power_of_2(n: int) -> int:
+    return 1 if n == 0 else 2**(math.ceil(math.log2(n)))
 
 def main():
     os.makedirs("assets/romfs/haxe3ds", exist_ok=True)
@@ -60,11 +71,30 @@ def main():
         
         print(f"\nProcessing sprite sheet: {name}")
         
-        print(f"  [1/3] Converting {png_path} to {t3x_path} using tex3ds...")
+        png_to_convert = png_path
+        if HAS_PILLOW:
+            try:
+                img = Image.open(png_path)
+                width, height = img.size
+                new_width = next_power_of_2(width)
+                new_height = next_power_of_2(height)
+                
+                if new_width != width or new_height != height:
+                    print(f"  [!] Padding {name} from {width}x{height} to {new_width}x{new_height} (3DS requires Power of 2)")
+                    new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
+                    new_img.paste(img, (0, 0))
+                    png_to_convert = os.path.join(root, name + "_padded.png")
+                    new_img.save(png_to_convert)
+            except Exception as e:
+                print(f"  WARNING: Could not check/Pad image with Pillow: {e}")
+
+        print(f"  [1/3] Converting to {t3x_path} using tex3ds...")
         try:
-            subprocess.run([tex3ds_path, png_path, "-o", t3x_path, "-f", "rgba8"], check=True, env=os.environ)
+            subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], check=True, env=os.environ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception as e:
-            print(f"  ERROR: tex3ds failed on {png_path}. Skipping. ({e})")
+            print(f"  ERROR: tex3ds failed on {png_to_convert}. Skipping. ({e})")
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
             continue
 
         print(f"  [2/3] Generating 10-column {cea_path} from {xml_path}...")
@@ -85,15 +115,16 @@ def main():
                 frameWidth = subtex.get("frameWidth", width)
                 frameHeight = subtex.get("frameHeight", height)
                 
+                if not frame_name:
+                    continue
+                    
                 if "_" in frame_name and frame_name.split("_")[-1].isdigit():
                     parts = frame_name.rsplit("_", 1)
                     anim_name = parts[0]
                     frame_idx = int(parts[1]) // 10000
                     cea_line = f"{t3x_name}?{x}?{y}?{width}?{height}?{frameX}?{frameY}?{frameWidth}?{frameHeight}?{anim_name}-{frame_idx}"
-                elif frame_name and frame_name.isdigit():
+                elif frame_name.isdigit():
                     cea_line = f"{t3x_name}?{x}?{y}?{width}?{height}?{frameX}?{frameY}?{frameWidth}?{frameHeight}?{name}-{int(frame_name)}"
-                elif not frame_name:
-                    continue
                 else:
                     cea_line = f"{t3x_name}?{x}?{y}?{width}?{height}?{frameX}?{frameY}?{frameWidth}?{frameHeight}?{frame_name}"
                     
@@ -104,32 +135,62 @@ def main():
                 
         except Exception as e:
             print(f"  ERROR: Failed to parse XML {xml_path}: {e}")
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
             continue
 
-        print(f"  [3/3] Cleaning up original {name}.png and {name}.xml...")
+        print(f"  [3/3] Cleaning up original files...")
         try:
             os.remove(png_path)
             os.remove(xml_path)
-            print(f"  SUCCESS: {name} converted to 10-column CEA and cleaned up.")
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
+            print(f"  SUCCESS: {name} converted to CEA and cleaned up.")
         except Exception as e:
             print(f"  WARNING: Could not delete original files for {name}: {e}")
 
     for root, name, ext, file_path in other_files:
         if not os.path.exists(file_path): continue
+        
         if ext == ".mp3" and os.path.normpath(file_path) not in excluded_files:
             out_path = os.path.join(root, name + ".ogg")
             try:
-                subprocess.run(["ffmpeg", "-y", "-i", file_path, "-q:a", "4", out_path], check=True)
+                print(f"Converting {name}.mp3 to .ogg...")
+                subprocess.run(["ffmpeg", "-y", "-i", file_path, "-q:a", "4", out_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 os.remove(file_path)
-            except Exception as e: print(f"Error converting {file_path} to OGG: {e}")
+            except Exception as e: 
+                print(f"Error converting {file_path} to OGG: {e}")
+                
         elif ext in [".wav", ".ogg"] and os.path.normpath(file_path) not in excluded_files:
             out_path = os.path.join(root, name + ".cwav")
             try:
-                cmd = [cwavtool_path, "-i", file_path, "-o", out_path]
-                if os.path.normpath(file_path) in looped_files: cmd.extend(["-ls", "0", "-le", "end"])
-                subprocess.run(cmd, check=True, env=os.environ)
-                if ext == ".wav": os.remove(file_path)
-            except Exception as e: print(f"Error converting {file_path} to CWAV: {e}")
+                is_music = "music" in root.lower() or "song" in root.lower() or "voices" in root.lower() or "inst" in root.lower()
+                channels = 2 if is_music else 1
+                
+                temp_wav = os.path.join(root, name + "_temp.wav")
+                print(f"  Normalizing {name}{ext} to {channels}ch, 32kHz WAV for 3DS...")
+                
+                subprocess.run([
+                    "ffmpeg", "-y", "-i", file_path, 
+                    "-ar", "32000", "-ac", str(channels), "-c:a", "pcm_s16le", 
+                    temp_wav
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                
+                print(f"  Converting to CWAV...")
+                cmd = [cwavtool_path, "-i", temp_wav, "-o", out_path]
+                if os.path.normpath(file_path) in looped_files: 
+                    cmd.extend(["-ls", "0", "-le", "end"])
+                subprocess.run(cmd, check=True, env=os.environ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                
+                os.remove(temp_wav)
+                if ext == ".wav": 
+                    os.remove(file_path)
+                print(f"  SUCCESS: {name} converted to CWAV.")
+                
+            except Exception as e: 
+                print(f"  ERROR converting {file_path} to CWAV: {e}")
+                if os.path.exists(temp_wav):
+                    os.remove(temp_wav)
 
 if __name__ == "__main__":
     main()
