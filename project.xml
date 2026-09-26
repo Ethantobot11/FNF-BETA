@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<app title="Deltarune" file="Deltarune" packageName="com.haxe.deltarune" package="com.haxe.deltarune" main="Main" version="1.2.5" company="Ethantobot" />
+
+	<!--Switch Export with Unique ApplicationID and Icon-->
+	<set name="APP_ID" value="0x0100f6c013bbc000" />
+
+	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
+		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
+	<!-- <app preloader="Preloader" resizable="true" /> -->
+	<app preloader="flixel.system.FlxPreloader" />
+
+	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
+	<set name="SWF_VERSION" value="11.8" />
+
+	<window width="1280" height="720" fps="60" background="#000000" hardware="true" vsync="false" allow-high-dpi="true" />
+
+	<!--HTML5-specific-->
+	<window if="html5" resizable="true" />
+
+	<!--Desktop-specific-->
+	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+
+	<!--Mobile-specific-->
+	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false" allow-shaders="true" require-shaders="true" />
+
+	<!--Switch-specific-->
+	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />
+
+	<set name="BUILD_DIR" value="export/debug" if="debug" />
+	<set name="BUILD_DIR" value="export/release" unless="debug" />
+	<set name="BUILD_DIR" value="export/32bit" if="32bits" />
+
+	<source path="source" />
+
+	<assets path="assets" />
+
+	<haxelib name="haxe3ds" />
+    <haxelib name="citroengine" />
+
+	<!-- ______________________________ Haxedefines _____________________________ -->
+
+	<!--Enable this for Nape release builds for a serious peformance improvement-->
+	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+	
+	<!--Enable this for Nape release builds for a serious peformance improvement-->
+	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+
+	<!--Used for crash handler-->
+	<section if="cpp">
+		<haxedef name="HXCPP_CHECK_POINTER" />
+		<haxedef name="HXCPP_STACK_LINE" />
+		<haxedef name="HXCPP_STACK_TRACE" />
+		<haxedef name="HXCPP_CATCH_SEGV" />
+	</section>
+	
+	<!-- Do whatever you want I'm tired uninstall and install everytime -->
+	<certificate path="key.keystore" password="psychengine" alias="psychport" alias-password="psychengine" if="android" unless="debug" />
+
+	<!-- Category Type for Apple Systems -->
+	<config:ios category_type="public.app-category.music-games" />
+	<config:mac category_type="public.app-category.music-games" />
+
+	<!--Disable deprecated warnings-->
+	<haxedef name="message.reporting" value="pretty" />
+	<haxedef name='no-deprecation-warnings' />
+
+	<!--Avoid memory leaks with for loops in HScript-->
+	<haxedef name="loop_unroll_max_cost" value="25" />
+	<haxedef name="DISABLED_MACRO_SUPERLATIVE" if="android" />
+	<haxedef name="lime_use_old_deltatime" />
+	<haxedef name="SHARE_MOBILE_FILES" if="mobile" />
+
+	<!-- _________________________________ Custom _______________________________ -->
+
+	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
+</project>

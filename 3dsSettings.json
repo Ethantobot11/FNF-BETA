@@ -1,0 +1,26 @@
+{
+	"settings": {
+		"linkOptions": {
+			"ip": "",
+			"openEmuIfTransferFailed": false,
+			"link3dsToConsole": true
+		},
+		"libraries": [
+			"haxe3ds",
+			"libcwav",
+			"libncsnd"
+		],
+		"defines": [],
+		"compileAsCIA": true,
+		"optimizations": {
+			"o2Flag": false,
+			"gFlag": false
+		},
+		"deleteTempFiles": true
+	},
+	"metadata": {
+		"title": "FNF 3DS",
+		"description": "i like fnf",
+		"author": "Ethantobot"
+	}
+}

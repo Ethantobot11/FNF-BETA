@@ -1,0 +1,10 @@
+{
+	"[HAXE3DS_FLAGS]": [
+		"-lcitro3d",
+		"-lcitro2d",
+		"-lcitro3d",
+		"-lcitro2d",
+        "-lctru",
+        "-lm"
+	]
+}

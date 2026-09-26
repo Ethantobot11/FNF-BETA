@@ -1,0 +1,201 @@
+name: Build Consoles
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      buildArgs:
+        required: true
+        type: string
+      artifactName:
+        required: true
+        type: string
+      artifactPath:
+        required: true
+        type: string
+
+env:
+  HAXE_VERSION: 4.3.6
+
+jobs:
+  build-console:
+    name: Build
+    runs-on: ${{ inputs.os }}
+    container:
+      image: ${{ inputs.name == 'Nintendo 3DS' && 'devkitpro/devkitarm:latest' || 'devkitpro/devkitppc:latest' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+
+      - name: Install System Dependencies (Wii U)
+        if: inputs.name == 'Wii U'
+        run: |
+          apt-get update && apt-get install -y build-essential git wget curl       
+
+      - name: Install Console Toolchains & Audio Dependencies
+        run: |
+          if [ "${{ inputs.name }}" = "Nintendo 3DS" ]; then
+            dkp-pacman -S --noconfirm --needed 3ds-dev citro3d citro2d 3ds-portlibs general-tools
+            git clone https://github.com/PabloMK7/libcwav.git --recursive
+            cd libcwav
+            make install
+            cp lib/libcwav.a /opt/devkitpro/portlibs/3ds/lib/libcwav.a
+            cp include/cwav.h /opt/devkitpro/portlibs/3ds/include/
+            if [ -f "libncsnd/lib/libncsnd.a" ]; then
+                cp libncsnd/lib/libncsnd.a /opt/devkitpro/portlibs/3ds/lib/libncsnd.a
+                cp libncsnd/include/ncsnd.h /opt/devkitpro/portlibs/3ds/include/
+            fi
+            cd ..
+            rm -rf libcwav
+            git clone https://github.com/PabloMK7/cwavtool.git
+            cd cwavtool
+            rm -rf buildtools
+            git clone https://github.com/Steveice10/buildtools.git buildtools
+            make
+            mkdir -p /opt/devkitpro/tools/bin
+            cp output/linux-x86_64/cwavtool /opt/devkitpro/tools/bin/cwavtool
+            chmod +x /opt/devkitpro/tools/bin/cwavtool
+            cd ..
+            rm -rf cwavtool
+            wget -q https://github.com/diasurgical/bannertool/releases/download/1.2.0/bannertool.zip -O bannertool.zip
+            unzip -q bannertool.zip -d bannertool_extracted
+            find bannertool_extracted -type f -name "bannertool" -exec cp {} /opt/devkitpro/tools/bin/ \;
+            chmod +x /opt/devkitpro/tools/bin/bannertool
+            wget -q https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.16/makerom-linux_x86_64-v0.16.zip -O makerom.zip
+            unzip -q makerom.zip -d makerom_extracted
+            find makerom_extracted -type f -name "makerom" -exec cp {} /opt/devkitpro/tools/bin/ \;
+            chmod +x /opt/devkitpro/tools/bin/makerom
+            rm -rf bannertool.zip bannertool_extracted makerom.zip makerom_extracted
+          elif [ "${{ inputs.name }}" = "Wii U" ]; then
+            dkp-pacman -S --noconfirm --needed devkitppc-gcc wut wut-tools general-tools wiiu-dev
+            mkdir -p .haxelib
+            haxelib setup .haxelib
+            haxelib git hxcpp https://github.com/kittycathy233/hxcpp --quiet
+            haxelib git hxu_wut https://github.com/Ethantobot11/HxU_WUT --quiet
+            haxelib git hxu_libnotifications https://github.com/Ethantobot11/HxU_LibNotifications --quiet
+            haxelib git hxu_libmappedmemory https://github.com/Ethantobot11/HxU_LibMappedMemory --quiet
+            haxelib git slushiutilsU https://github.com/Ethantobot11/slushiUtilsU --quiet
+            haxelib git hxu_sdl2 https://github.com/Ethantobot11/HxU_SDL2 --quiet
+            haxelib git hxu_sdl_fontcache https://github.com/Ethantobot11/HxU_SDL_FontCache --quiet
+            haxelib git hxu_jansson https://github.com/Ethantobot11/HxU_Jansson --quiet
+            haxelib git hxu_vorbis https://github.com/Ethantobot11/HxU_Vorbis --quiet
+            haxelib git reflaxe https://github.com/SomeRanDev/reflaxe.git --quiet
+            haxelib git reflaxe.cpp https://github.com/Ethantobot11/reflaxe.CPP nightly --quiet
+            haxelib list
+          fi
+      - name: Build HXCPP Runner and Tools
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          mkdir -p .haxelib
+          haxelib setup .haxelib
+
+          haxelib git hxcpp https://github.com/PsychEngine-report/hxcpp --quiet
+
+          cd .haxelib/hxcpp/git/tools/run
+          haxe compile.hxml
+          cd ../hxcpp
+          haxe compile.hxml
+          cd ../../../../
+
+      - name: Setup Virtual Environment and Install Pillow
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip install Pillow --break-system-packages
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          export PATH=/opt/devkitpro/tools/bin:$PATH
+
+      - name: Convert Images, XMLs & Audio Files
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          python3 convert_assets.py
+
+      - name: Check Assets in Export Directory Before Packaging
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          echo "=== Scanning for RomFS / Assets in export folder ==="
+          if [ -d "export" ]; then
+            find export -type f \( -name "*.cea" -o -name "*.png" -o -name "*.json" -o -name "*.ogg" \) || echo "No specific asset files found matching filters."
+            echo "=== Full tree of export folder ==="
+            find export -maxdepth 3 -type d || true
+          else
+            echo "export directory does not exist yet."
+          fi
+
+      - name: Build and Install 3DS Audio Libraries
+        if: inputs.name == 'Nintendo 3DS'
+        run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=${DEVKITPRO}/devkitARM
+          export PATH=${DEVKITARM}/bin:${DEVKITPRO}/tools/bin:$PATH
+          export CXX=arm-none-eabi-g++
+          export CC=arm-none-eabi-gcc
+          export AR=arm-none-eabi-ar
+          export RANLIB=arm-none-eabi-ranlib
+
+          haxelib git libcwav https://github.com/PabloMK7/libcwav.git --quiet
+          haxelib git libncsnd https://github.com/PabloMK7/libncsnd.git --quiet
+          haxelib git haxe3ds https://github.com/Ethantobot11/Haxe3DS.git --quiet
+
+          haxelib run haxe3ds -c -Dnx -Dno_pch
+
+      - name: Verify RomFS Inside Built CIA
+        if: always() && inputs.name == 'Nintendo 3DS'
+        run: |
+          export PATH=/opt/devkitpro/tools/bin:$PATH
+          if [ -f "buildFiles/output.cia" ]; then
+            echo "=== Inspecting CIA RomFS Structure ==="
+            ls -lh buildFiles/output.cia
+          else
+            echo "output.cia not found!"
+          fi
+
+      - name: Archive and Upload Workspace for Inspection
+        if: always() && inputs.name == 'Nintendo 3DS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-debug-3ds
+          path: |
+            buildFiles/
+          if-no-files-found: ignore
+          
+      - name: Compile for Wii U via HxCompileU
+        if: inputs.name == 'Wii U'
+        run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITPPC=${DEVKITPRO}/devkitPPC
+          export DEVKITARM=${DEVKITPRO}/devkitARM
+          export PATH=${DEVKITPPC}/bin:${DEVKITPRO}/tools/bin:$PATH
+          export PATH=${DEVKITARM}/bin:${DEVKITPRO}/tools/bin:$PATH
+          git clone https://github.com/PsychEngine-report/hxCompileU.git
+          cd hxCompileU
+          haxe build.hxml
+          cp export/haxeCompileU ../haxeCompileU
+          cd ..
+          ./haxeCompileU --compile
+
+      - name: Archive and Upload Workspace for Inspection
+        if: always() && inputs.name == 'Wii U'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-debug-wiiu
+          path: |
+            output/
+          if-no-files-found: ignore
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ inputs.artifactName }}
+          path: ${{ inputs.artifactPath }}
+          if-no-files-found: error

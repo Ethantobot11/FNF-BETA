@@ -1,0 +1,90 @@
+name: Build Chart Editor For All Platforms
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+  discussions: write
+
+env:
+  PROJECT_NAME: Deltarune-3DS
+  REPO_PATH: Ethantobot11/3DS-test
+
+jobs:
+  get-commit-hash:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_hash: ${{ steps.get_commit_hash.outputs.COMMIT_HASH }}
+    steps:
+      - name: Check Repository
+        run: |
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "REPO_PATH: ${{ env.REPO_PATH }}"
+          if [[ "$GITHUB_REPOSITORY" != "${{ env.REPO_PATH }}" ]]; then
+            echo "Doesn't seem to be correct, returning SIGABRT..."
+            exit 6
+          else
+            echo "Seems to be correct..."
+          fi
+      - name: Get latest commit hash
+        id: get_commit_hash
+        run: |
+          commit_hash=${GITHUB_SHA::7}
+          echo "Latest commit hash is $commit_hash"
+          echo "::set-output name=COMMIT_HASH::$commit_hash"
+  Build-Consoles:
+    name: ${{ matrix.name }}
+    strategy:
+      matrix:
+        include:
+          - name: Nintendo 3DS
+            os: ubuntu-latest
+            buildArgs: "3ds -D haxe3ds -D final"
+            artifactName: 3DSBuild
+            artifactPath: "buildFiles/*.cia"
+         # - name: Wii U
+         #   os: ubuntu-latest
+         #   buildArgs: "wiiu -D final -D cafe"
+         #   artifactName: WiiUBuild
+         #   artifactPath: "output/wiiuFiles/*.wuhb"
+    uses: ./.github/workflows/consoles.yml
+    with:
+      name: ${{ matrix.name }}
+      os: ${{ matrix.os }}
+      buildArgs: ${{ matrix.buildArgs }}
+      artifactName: ${{ matrix.artifactName }}
+      artifactPath: ${{ matrix.artifactPath }}
+
+  Releaser:
+    needs: [get-commit-hash, Build-Consoles]
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Download 3DS Build
+        uses: actions/download-artifact@main
+        with:
+           name: 3DSBuild
+           path: buildFiles/
+
+      - name: Move 3DS CIA
+        run: mv buildFiles/output.cia buildFiles/${{ env.PROJECT_NAME }}.cia
+
+     # - name: Download WiiUBuild Build
+     #   uses: actions/download-artifact@main
+     #   with:
+     #      name: WiiUBuild
+     #      path: output/wiiuFiles/
+
+     # - name: Move WiiUBuild Whub
+     #   run: mv output/wiiuFiles/*.wuhb output/wiiuFiles/${{ env.PROJECT_NAME }}.wuhb
+
+      - name: Publish The Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "DevBuild ${{ needs.get-commit-hash.outputs.commit_hash }}"
+          tag_name: "devbuild-${{ needs.get-commit-hash.outputs.commit_hash }}"
+          make_latest: true
+          #prerelease: false
+          files: |
+            buildFiles/*cia
+       #     output/wiiuFiles/*wuhb
