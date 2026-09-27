@@ -8,9 +8,14 @@ class NoteSplash extends CitroAnimate
 	private var textureLoaded:String = null;
 
 	public function new(x:Float = 0, y:Float = 0, ?note:Int = 0) {
-		super(x, y, "");
+		super("");
+		this.x = x;
+		this.y = y;
+		
 		var skin:String = 'noteSplashes';
-		if(PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) skin = PlayState.SONG.splashSkin;
+		if(PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) {
+			skin = PlayState.SONG.splashSkin;
+		}
 		setupNoteSplash(x, y, note, skin);
 	}
 
@@ -21,7 +26,9 @@ class NoteSplash extends CitroAnimate
 
 		if(texture == null) {
 			texture = 'noteSplashes';
-			if(PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) texture = PlayState.SONG.splashSkin;
+			if(PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) {
+				texture = PlayState.SONG.splashSkin;
+			}
 		}
 
 		if(textureLoaded != texture) {
@@ -33,11 +40,10 @@ class NoteSplash extends CitroAnimate
 		this.play('note' + note + '-' + animNum);
 	}
 
-	override public function update(delta:Int):Bool {
+	override public function update():Bool {
 		if(this.curAnim != null && this.finished) {
 			this.visible = false;
-			this.active = false;
 		}
-		return super.update(delta);
+		return super.update();
 	}
 }
