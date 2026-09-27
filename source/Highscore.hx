@@ -88,7 +88,7 @@ class Highscore
 	}
 
 	public static function load():Void {
-		CitroG.save.bind('funkin', 'ninjamuffin99');
+		CitroG.save.data('funkin', 'ninjamuffin99');
 		if (CitroG.save.data.weekScores != null) weekScores = CitroG.save.data.weekScores;
 		if (CitroG.save.data.songScores != null) songScores = CitroG.save.data.songScores;
 		if (CitroG.save.data.songRating != null) songRating = CitroG.save.data.songRating;

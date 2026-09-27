@@ -106,9 +106,9 @@ class Note extends CitroAnimate
 	}
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false) {
-		super(""); // CitroAnimate only takes ceaFile:String
-		this.x = 0;
-		this.y = 0;
+		super("");
+        this.x = 0;
+        this.y = 0;
 		
 		if (prevNote == null) prevNote = this;
 		this.prevNote = prevNote;
@@ -162,19 +162,20 @@ class Note extends CitroAnimate
 		if(this.curAnim != null) this.play(this.curAnim);
 	}
 
-	// CitroObject.update() takes NO arguments. We use CitroG.deltaTime instead.
 	override public function update():Bool {
-		var elapsed:Float = CitroG.deltaTime / 1000.0;
-		if (mustPress) {
-			canBeHit = (strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * lateHitMult) && strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult));
-			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit) tooLate = true;
-		} else {
-			canBeHit = false;
-			if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult)) {
-				if((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition) wasGoodHit = true;
-			}
-		}
-		if (tooLate && !inEditor && this.alpha > 0.3) this.alpha = 0.3;
-		return super.update();
-	}
+        var elapsed:Float = CitroG.deltaTime / 1000.0;
+        
+        if (mustPress) {
+            canBeHit = (strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * lateHitMult) && strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult));
+            if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit) tooLate = true;
+        } else {
+            canBeHit = false;
+            if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult)) {
+                if((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition) wasGoodHit = true;
+            }
+        }
+        if (tooLate && !inEditor && this.alpha > 0.3) this.alpha = 0.3;
+        
+        return super.update();
+    }
 }

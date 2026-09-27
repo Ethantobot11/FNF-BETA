@@ -86,7 +86,7 @@ class ClientPrefs {
 
 	public static function saveSettings():Void {
 		// Bind and save using Citro's save system
-		CitroG.save.bind('funkin', 'ninjamuffin99');
+		CitroG.save.data('funkin', 'ninjamuffin99');
 		
 		CitroG.save.data.downScroll = downScroll;
 		CitroG.save.data.middleScroll = middleScroll;
@@ -123,7 +123,7 @@ class ClientPrefs {
 		CitroG.save.flush();
 
 		// Separate save for controls so they aren't wiped by general resets
-		CitroG.save.bind('controls_v2', 'ninjamuffin99');
+		CitroG.save.data('controls_v2', 'ninjamuffin99');
 		CitroG.save.data.customControls = keyBinds;
 		CitroG.save.flush();
 		
@@ -131,7 +131,7 @@ class ClientPrefs {
 	}
 
 	public static function loadPrefs():Void {
-		CitroG.save.bind('funkin', 'ninjamuffin99');
+		CitroG.save.data('funkin', 'ninjamuffin99');
 		
 		if(CitroG.save.data.downScroll != null) downScroll = CitroG.save.data.downScroll;
 		if(CitroG.save.data.middleScroll != null) middleScroll = CitroG.save.data.middleScroll;
@@ -172,7 +172,7 @@ class ClientPrefs {
 		}
 
 		// Load custom controls
-		CitroG.save.bind('controls_v2', 'ninjamuffin99');
+		CitroG.save.data('controls_v2', 'ninjamuffin99');
 		if(CitroG.save.data.customControls != null) {
 			var loadedControls:Map<String, Array<UInt32>> = CitroG.save.data.customControls;
 			for (control => keys in loadedControls) {

@@ -66,12 +66,10 @@ class PlayState extends MusicBeatState
 	public var scoreTxt:CitroText;
 	public var timeTxt:CitroText;
 
-	public static var isPixelStage:Bool = false;
-	public static var daPixelZoom:Float = 6;
 	public static var SONG:SwagSong = null;
-	public static var isPixelStage:Bool = false;
-	public static var daPixelZoom:Float = 6;
-	public static var instance:PlayState;
+    public static var isPixelStage:Bool = false;
+    public static var daPixelZoom:Float = 6;
+    public static var instance:PlayState;
 
 	override public function create():Void {
 		instance = this;

@@ -7,6 +7,7 @@ import sys.thread.Thread;
 
 import citro.CitroG;
 import citro.state.CitroState;
+import citro.object.CitroObject;
 import citro.object.CitroSprite;
 import citro.object.CitroAnimate;
 import citro.math.CitroMath;
@@ -77,7 +78,7 @@ class TitleState extends MusicBeatState
 		//swagShader = new ColorSwap(); // Keep your custom shader class
 		super.create();
 
-		CitroG.save.bind('funkin', 'ninjamuffin99');
+		CitroG.save.data('funkin', 'ninjamuffin99');
 		ClientPrefs.loadPrefs();
 
 		#if CHECK_FOR_UPDATES

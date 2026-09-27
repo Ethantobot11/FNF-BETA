@@ -82,7 +82,9 @@ class Character extends CitroAnimate
 
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
 	{
-		super(x, y, "");
+		super(""); // CitroAnimate ONLY takes the ceaFile string
+    	this.x = x;    
+		this.y = y;
 		
 		#if (haxe >= "4.0.0")
 		animOffsets = new Map();
@@ -176,9 +178,9 @@ class Character extends CitroAnimate
 		}
 	}
 
-	override public function update(delta:Int):Bool
+	override public function update():Bool 
 	{
-		var elapsed:Float = delta / 1000.0;
+    	var elapsed:Float = CitroG.deltaTime / 1000.0;
 
 		if(!debugMode && this.curAnim != null) {
 			if(heyTimer > 0) {
@@ -228,7 +230,7 @@ class Character extends CitroAnimate
 			}
 		}
 
-		return super.update(delta);
+		return super.update();
 	}
 
 	public var danced:Bool = false;
