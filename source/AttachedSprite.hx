@@ -3,7 +3,7 @@ package;
 import citro.object.CitroText;
 import citro.object.CitroSprite;
 
-class AttachedText extends CitroText
+class AttachedSprite extends CitroSprite
 {
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;

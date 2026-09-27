@@ -171,6 +171,6 @@ class NotesSubState extends MusicBeatSubstate {
 		ClientPrefs.arrowHSV[curSelected][typeSelected] = roundedValue;
 
 		var item = grpNumbers[(curSelected * 3) + typeSelected];
-		item.textObject.text = Std.string(roundedValue);
+		item.text = Std.string(roundedValue);
 	}
 }

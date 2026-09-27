@@ -221,7 +221,7 @@ class PauseSubState extends MusicBeatSubstate
 		}
 	}
 
-	function closeSub():Void {
+	override function closeSub():Void {
 		CitroG.substate = null;
         if (PlayState.instance != null) {
 			PlayState.instance.paused = false;

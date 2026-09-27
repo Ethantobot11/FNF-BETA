@@ -54,7 +54,7 @@ class NoteOffsetState extends MusicBeatState
 			var stageLight2:CitroSprite = new CitroSprite(1225, -100);
 			stageLight2.loadGraphic(Paths.image('stage_light'));
 			stageLight2.scale.set(0.9 * 1.1, 0.9 * 1.1);
-			stageLight2.flipX = true;
+			stageLight2.scale.x = -Math.abs(stageLight2.scale.x);
 			CitroG.state.members.push(stageLight2);
 
 			var stageCurtains:CitroSprite = new CitroSprite(-500, -300);
@@ -140,7 +140,7 @@ class NoteOffsetState extends MusicBeatState
 		updateNoteDelay();
 		updateMode();
 
-		SoundPlayer.playSound(Paths.music('offsetSong'), true);
+		SoundPlayer.playSound(Paths.music('offsetSong'));
 		Conductor.changeBPM(128.0);
 
 		super.create();
@@ -203,7 +203,7 @@ class NoteOffsetState extends MusicBeatState
 		if(controls.BACK) {
 			persistentUpdate = false;
 			MusicBeatState.switchState(new OptionsState());
-			SoundPlayer.playSound(Paths.music('freakyMenu'), true);
+			SoundPlayer.playSound(Paths.music('freakyMenu'));
 		}
 
 		// Conductor.songPosition = MusicPlayer.getTime(); // TODO

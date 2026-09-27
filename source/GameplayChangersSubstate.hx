@@ -132,7 +132,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		super.update(delta);
 	}
 
-	function closeSub():Void { CitroG.substate = null; }
+	override function closeSub():Void { CitroG.substate = null; }
 
 	function updateTextFrom(option:GameplayOption) {
 		var text:String = option.displayFormat;
