@@ -260,12 +260,12 @@ class ModMetadata {
 				var colors:Array<Int> = Reflect.getProperty(stuff, "color");
 				var desc:String = Reflect.getProperty(stuff, "description");
 				var name:String = Reflect.getProperty(stuff, "name");
-				var restart:Bool = Reflect.getProperty(stuff, "restart");
+				var restartVal:Dynamic = Reflect.getProperty(stuff, "restart");
 
 				if(name != null && name.length > 0 && name != 'Name') this.name = name;
 				if(desc != null && desc.length > 0 && desc != 'Description') this.description = desc;
 				if(colors != null && colors.length > 2) this.color = (0xFF << 24) | (colors[0] << 16) | (colors[1] << 8) | colors[2];
-				if(restart != null) this.restart = restart;
+				if(restartVal != null) this.restart = restartVal;
 			}
 		}
 	}
