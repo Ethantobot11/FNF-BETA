@@ -252,7 +252,7 @@ def main():
             except Exception as e: 
                 print(f"Error converting {file_path} to OGG: {e}")
                 
-        elif ext in [".wav", ".ogg"] and os.path.normpath(file_path) not in excluded_files:
+        elif ext in [".wav", ".ogg" ,".mp3"] and os.path.normpath(file_path) not in excluded_files:
             out_path = os.path.join(root, name + ".cwav")
             try:
                 is_music = "music" in root.lower() or "song" in root.lower() or "voices" in root.lower() or "inst" in root.lower()
@@ -274,8 +274,7 @@ def main():
                 subprocess.run(cmd, check=True, env=os.environ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 
                 os.remove(temp_wav)
-                if ext == ".wav": 
-                    os.remove(file_path)
+                os.remove(file_path)
                 print(f"  SUCCESS: {name} converted to CWAV.")
                 
             except Exception as e: 
