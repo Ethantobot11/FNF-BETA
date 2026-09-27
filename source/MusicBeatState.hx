@@ -4,6 +4,9 @@ import citro.state.CitroState;
 import citro.CitroG;
 
 class MusicBeatState extends CitroState {
+    public var persistentUpdate:Bool = true;
+    public var persistentDraw:Bool = true;
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -102,6 +105,11 @@ class MusicBeatState extends CitroState {
 		// Override in subclasses
 	}
 
+    public function openSubState(substate:CitroSubState):Void {
+        CitroG.substate = substate;
+        substate.create();
+    }
+
 	function getBeatsOnSection():Float {
 		var val:Null<Float> = 4;
 		if(PlayState.SONG != null && PlayState.SONG.notes[curSection] != null) {
@@ -109,4 +117,11 @@ class MusicBeatState extends CitroState {
 		}
 		return val == null ? 4 : val;
 	}
+
+    public function closeSubState():Void {
+        if (CitroG.substate != null) {
+            CitroG.substate.destroy();
+            CitroG.substate = null;
+        }
+    }
 }

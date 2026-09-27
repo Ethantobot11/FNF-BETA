@@ -24,6 +24,7 @@ class CitroSprite extends CitroObject {
     public var srcY:Float = 0;
     public var srcWidth:Float = 0;
     public var srcHeight:Float = 0;
+    public var antialiasing:Bool = true;
     public var useSrcRect:Bool = false;
 
     public function new(x:Float = 0, y:Float = 0) {

@@ -40,6 +40,30 @@ class Controls {
 		}
 	}
 
+    public var UI_UP_P(get, never):Bool;
+    inline function get_UI_UP_R() return check(Action.UI_UP);
+
+    public var UI_DOWN_P(get, never):Bool;
+    inline function get_UI_DOWN_R() return check(Action.UI_DOWN);
+
+    public var UI_LEFT_P(get, never):Bool;
+    inline function get_UI_LEFT_R() return check(Action.UI_LEFT);
+
+    public var UI_RIGHT_P(get, never):Bool;
+    inline function get_UI_RIGHT_R() return check(Action.UI_RIGHT);
+
+    public var UI_UP_P(get, never):Bool;
+    inline function get_UI_UP_P() return check(Action.UI_UP);
+
+    public var UI_DOWN_P(get, never):Bool;
+    inline function get_UI_DOWN_P() return check(Action.UI_DOWN);
+
+    public var UI_LEFT_P(get, never):Bool;
+    inline function get_UI_LEFT_P() return check(Action.UI_LEFT);
+
+    public var UI_RIGHT_P(get, never):Bool;
+    inline function get_UI_RIGHT_P() return check(Action.UI_RIGHT);
+
 	public var UI_UP(get, never):Bool;
 	inline function get_UI_UP() return check(Action.UI_UP);
 

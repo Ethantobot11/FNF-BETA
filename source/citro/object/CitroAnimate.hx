@@ -31,6 +31,7 @@ class CitroAnimate extends CitroObject {
     public var curAnim:String = "";
     public var finished:Bool = false;
     public var looped:Bool = false;
+    public var antialiasing:Bool = true;
 
     public function new(ceaFile:String, defaultAnim:String = "") {
         super();

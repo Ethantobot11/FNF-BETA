@@ -1,6 +1,7 @@
 package;
 
 import citro.object.CitroAnimate;
+import citro.object.CitroObject;
 import citro.CitroG;
 
 using StringTools;
@@ -26,7 +27,7 @@ class HealthIcon extends CitroAnimate
 	{
 		if (sprTracker != null) {
 			// Adjust position relative to the tracked object (e.g., HealthBar)
-			this.x = sprTracker.x + sprTracker.width + 12;
+			this.x = sprTracker.x + sprTracker.CitroG.WIDTH + 12;
 			this.y = sprTracker.y - 30;
 		}
 		return super.update(delta);
@@ -61,7 +62,7 @@ class HealthIcon extends CitroAnimate
 			// Health icons are typically 2 frames. We assume the .cea has 'idle' (frame 0) and 'losing' (frame 1)
 			// or we can just rely on the .cea being set up correctly for the character.
 			
-			// Estimate offsets based on standard 150px width assumption
+			// Estimate offsets based on standard 150px CitroG.WIDTH assumption
 			iconOffsets[0] = (150 - 150) / 2; 
 			iconOffsets[1] = (150 - 150) / 2;
 			

@@ -157,22 +157,18 @@ class TitleState extends MusicBeatState
 		//persistentUpdate = true;
 
 		var bg:CitroSprite = new CitroSprite();
-		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none") {
-			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
-		} else {
-			bg.makeGraphic(WIDTH, HEIGHT, CitroColor.BLACK);
-		}
+        bg.loadGraphic(Paths.image('menuBG'));
 		CitroG.state.members.push(bg);
 
-		logoBl = new CitroAnimate(Paths.cea('logoBumpin'));
+		gfDance = new CitroAnimate(titleJSON.gfx, titleJSON.gfy, Paths.cea('gfDanceTitle'));
+
+        gfDance = new CitroAnimate(Paths.cea('gfDanceTitle'));
+        gfDance.x = titleJSON.gfx;
+        gfDance.y = titleJSON.gfy;
+
+        logoBl = new CitroAnimate(Paths.cea('logoBumpin'));
         logoBl.x = titleJSON.titlex;
         logoBl.y = titleJSON.titley;
-		
-		//swagShader = new ColorSwap();
-		
-		gfDance = new CitroAnimate(titleJSON.gfx, titleJSON.gfy, Paths.cea('gfDanceTitle'));
-		gfDance.framerate = 24;
-		gfDance.looped = true;
 
 		var easterEgg:String = CitroG.save.data.psychDevsEasterEgg;
 		if(easterEgg == null) easterEgg = '';
@@ -190,8 +186,9 @@ class TitleState extends MusicBeatState
 		CitroG.state.members.push(gfDance);
 		CitroG.state.members.push(logoBl);
 
-		titleText = new CitroAnimate(titleJSON.startx, titleJSON.starty, Paths.cea('titleEnter'));
-		titleText.framerate = 24;
+		titleText = new CitroAnimate(Paths.cea('titleEnter'));
+        titleText.x = titleJSON.startx;
+        titleText.y = titleJSON.starty;
 		titleText.play('idle');
 		CitroG.state.members.push(titleText);
 
@@ -203,7 +200,7 @@ class TitleState extends MusicBeatState
 		credGroup = [];
 		textGroup = [];
 
-		blackScreen = new CitroSprite().makeGraphic(WIDTH, HEIGHT, CitroColor.BLACK);
+		blackScreen = new CitroSprite().makeGraphic(CitroG.WIDTH, CitroG.HEIGHT, CitroColor.BLACK);
 		credGroup.push(blackScreen);
 		CitroG.state.members.push(blackScreen);
 
@@ -211,7 +208,7 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter(XY);
 		credTextShit.visible = false;
 
-		ngSpr = new CitroSprite(0, HEIGHT * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		ngSpr = new CitroSprite(0, CitroG.HEIGHT * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
 		CitroG.state.members.push(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.scale.set(0.8, 0.8);
@@ -246,7 +243,7 @@ class TitleState extends MusicBeatState
 		var elapsed:Float = delta / 1000.0;
 
 		if (Conductor.songPosition != null) {
-			Conductor.songPosition = YourMusicPlayer.getTime();
+			//Conductor.songPosition = YourMusicPlayer.getTime();
 		}
 
 		var pressedEnter:Bool = controls.ACCEPT; 
@@ -260,7 +257,7 @@ class TitleState extends MusicBeatState
 			if (newTitle && !pressedEnter) {
 				var timer:Float = titleTimer;
 				if (timer >= 1) timer = (-timer) + 2;
-				timer = CitroEase.apply(CitroEase.QUAD_INOUT, timer);
+				timer = timer < 0.5 ? 2 * timer * timer : 1 - Math.pow(-2 * timer + 2, 2) / 2;
 				
 				titleText.color = interpolateColor(titleTextColors[0], titleTextColors[1], timer);
 				titleText.alpha = CitroMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);

@@ -15,7 +15,7 @@ import sys.FileSystem;
 import haxe.Json;
 import Section.SwagSection;
 import Song.SwagSong;
-import Note.EventNote;
+//import Note.EventNote;
 import Conductor.Rating;
 
 using StringTools;
@@ -155,7 +155,7 @@ class PlayState extends MusicBeatState
         CitroG.state.members.push(boyfriend);
         
         // UI
-        healthBar = new SimpleBar(WIDTH / 2 - 200, HEIGHT * 0.89, 400, 20, CitroColor.WHITE);
+        healthBar = new SimpleBar(CitroG.WIDTH / 2 - 200, CitroG.HEIGHT * 0.89, 400, 20, CitroColor.WHITE);
         healthBar.maxValue = 2;
         healthBar.minValue = 0;
         healthBar.value = 1;
@@ -170,7 +170,7 @@ class PlayState extends MusicBeatState
         scoreTxt.alignment = CENTER;
         CitroG.state.members.push(scoreTxt);
         
-        timeTxt = new CitroText(WIDTH / 2 - 100, 19, "0:00");
+        timeTxt = new CitroText(CitroG.WIDTH / 2 - 100, 19, "0:00");
         timeTxt.alignment = CENTER;
         CitroG.state.members.push(timeTxt);
         
@@ -236,9 +236,9 @@ class PlayState extends MusicBeatState
         
         // Update UI
         if (healthBar != null) {
-            iconP1.x = healthBar.x + (healthBar.width * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) - 75;
+            iconP1.x = healthBar.x + (healthBar.CitroG.WIDTH * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) - 75;
             iconP1.y = healthBar.y - 75;
-            iconP2.x = healthBar.x + (healthBar.width * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) + 75;
+            iconP2.x = healthBar.x + (healthBar.CitroG.WIDTH * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) + 75;
             iconP2.y = healthBar.y - 75;
         }
         
@@ -412,7 +412,7 @@ class PlayState extends MusicBeatState
         totalPlayed++;
         RecalculateRating(false);
         
-        var ratingTxt = new CitroText(WIDTH * 0.35, HEIGHT * 0.4, daRating.name.toUpperCase());
+        var ratingTxt = new CitroText(CitroG.WIDTH * 0.35, CitroG.HEIGHT * 0.4, daRating.name.toUpperCase());
         ratingTxt.alignment = CENTER;
         CitroG.state.members.push(ratingTxt);
         
@@ -449,10 +449,10 @@ class SimpleBar extends CitroSprite {
     private var _value:Float = 0;
     private var fullWidth:Float;
     
-    public function new(x:Float, y:Float, width:Float, height:Float, color:CitroColor) {
+    public function new(x:Float, y:Float, CitroG.WIDTH:Float, CitroG.HEIGHT:Float, color:CitroColor) {
         super(x, y);
-        fullWidth = width;
-        this.makeGraphic(Std.int(width), Std.int(height), color);
+        fullWidth = CitroG.WIDTH;
+        this.makeGraphic(Std.int(CitroG.WIDTH), Std.int(CitroG.HEIGHT), color);
     }
     
     function get_value():Float return _value;
@@ -460,7 +460,7 @@ class SimpleBar extends CitroSprite {
         _value = val;
         var percent = (_value - minValue) / (maxValue - minValue);
         percent = CitroMath.clamp(percent, 0, 1);
-        this.setSourceRect(0, 0, Std.int(fullWidth * percent), this.height);
+        this.setSourceRect(0, 0, Std.int(fullWidth * percent), this.CitroG.HEIGHT);
         return _value;
     }
 }

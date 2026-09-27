@@ -19,6 +19,7 @@ typedef MenuCharacterFile = {
 
 class MenuCharacter extends CitroAnimate
 {
+    public var flipX:Bool = false;
 	public var character:String;
 	public var hasConfirmAnimation:Bool = false;
 	private static var DEFAULT_CHARACTER:String = 'bf';
@@ -80,6 +81,7 @@ class MenuCharacter extends CitroAnimate
 				}
 
 				this.flipX = (charFile.flipX == true);
+                this.scale.x = this.flipX ? -Math.abs(this.scale.x) : Math.abs(this.scale.x);
 
 				if(charFile.scale != null && charFile.scale != 1) {
 					this.scale.set(charFile.scale, charFile.scale);

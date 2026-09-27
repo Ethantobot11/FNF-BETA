@@ -48,7 +48,7 @@ class StrumNote extends CitroAnimate
 		this.play('static');
 		this.x += Note.swagWidth * noteData;
 		this.x += 50;
-		this.x += ((WIDTH / 2) * player);
+		this.x += ((CitroG.WIDTH / 2) * player);
 	}
 
 	override public function update(delta:Int):Bool {

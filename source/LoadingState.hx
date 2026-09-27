@@ -23,15 +23,15 @@ class LoadingState extends MusicBeatState
 	}
 
 	override function create() {
-		var bg:CitroSprite = new CitroSprite(0, 0).makeGraphic(WIDTH, HEIGHT, 0xffcaff4d);
+		var bg:CitroSprite = new CitroSprite(0, 0).makeGraphic(CitroG.WIDTH, CitroG.HEIGHT, 0xffcaff4d);
 		CitroG.state.members.push(bg);
 		
 		funkay = new CitroSprite(0, 0).loadGraphic(Paths.image('funkay'));
-		funkay.scale.set(1, HEIGHT / funkay.height);
+		funkay.scale.set(1, CitroG.HEIGHT / funkay.CitroG.HEIGHT);
 		funkay.screenCenter();
 		CitroG.state.members.push(funkay);
 
-		loadBar = new CitroSprite(0, HEIGHT - 20).makeGraphic(WIDTH, 10, 0xffff16d2);
+		loadBar = new CitroSprite(0, CitroG.HEIGHT - 20).makeGraphic(CitroG.WIDTH, 10, 0xffff16d2);
 		loadBar.screenCenter(X);
 		CitroG.state.members.push(loadBar);
 		
@@ -50,7 +50,7 @@ class LoadingState extends MusicBeatState
 		loadProgress += elapsed / MIN_TIME;
 		if(loadProgress > 1) loadProgress = 1;
 		loadBar.scale.x = loadProgress;
-		loadBar.x = (WIDTH - loadBar.width * loadBar.scale.x) / 2;
+		loadBar.x = (CitroG.WIDTH - loadBar.CitroG.WIDTH * loadBar.scale.x) / 2;
 	}
 	
 	function onLoad() {

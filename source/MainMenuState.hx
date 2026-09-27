@@ -108,8 +108,8 @@ class MainMenuState extends MusicBeatState
 		camFollowY = CitroMath.lerp(camFollowY, targetCamY, lerpVal);
 
 		for (item in menuItems) {
-            item.x = item.x - (camFollowX - WIDTH / 2) * 0.05;
-            item.y = item.y - (camFollowY - HEIGHT / 2) * 0.05;
+            item.x = item.x - (camFollowX - CitroG.WIDTH / 2) * 0.05;
+            item.y = item.y - (camFollowY - CitroG.HEIGHT / 2) * 0.05;
 		}
 
 		if (!selectedSomethin)
@@ -233,8 +233,8 @@ class MainMenuState extends MusicBeatState
 				if(menuItems.length > 4) {
 					add = menuItems.length * 8;
 				}
-				targetCamX = spr.x + (spr.width * spr.scale.x) / 2;
-				targetCamY = spr.y + (spr.height * spr.scale.y) / 2 - add;
+				targetCamX = spr.x + (spr.CitroG.WIDTH * spr.scale.x) / 2;
+				targetCamY = spr.y + (spr.CitroG.HEIGHT * spr.scale.y) / 2 - add;
 			}
 		}
 	}
