@@ -7,8 +7,8 @@ permissions:
   discussions: write
 
 env:
-  PROJECT_NAME: Deltarune-3DS
-  REPO_PATH: Ethantobot11/3DS-test
+  PROJECT_NAME: FNF-3DS
+  REPO_PATH: Ethantobot11/FNF-BETA
 
 jobs:
   get-commit-hash:
