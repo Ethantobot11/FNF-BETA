@@ -101,7 +101,7 @@ class CreditsState extends MusicBeatState
 				Paths.currentModDirectory = '';
 				if(curSelected == -1) curSelected = i;
 			} else {
-				optionText.alignment = Alignment.CENTER;
+				optionText.alignment = CENTERED;
 			}
 		}
 		
