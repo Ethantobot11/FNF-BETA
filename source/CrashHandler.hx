@@ -10,11 +10,11 @@ import citro.CitroG;
 import citro.state.CitroState;
 
 class CrashHandler {
-    private static var logsDir:String = "sdmc:/Deltarune/logs";
-    private static var crashDir:String = "sdmc:/Deltarune/crash";
+    private static var logsDir:String = "sdmc:/FNF-PE/logs";
+    private static var crashDir:String = "sdmc:/FNF-PE/crash";
     
-    private static var logPath:String = "sdmc:/Deltarune/logs/game_log.txt";
-    private static var crashPath:String = "sdmc:/Deltarune/crash/latest_crash.txt";
+    private static var logPath:String = "sdmc:/FNF-PE/logs/game_log.txt";
+    private static var crashPath:String = "sdmc:/FNF-PE/crash/latest_crash.txt";
     
     private static var originalTrace:Dynamic;
     private static var logOutput:FileOutput = null;
@@ -86,7 +86,7 @@ class CrashHandler {
             logException(e, "Runtime Crash Caught!");
             
             try {
-                var menuState = fallbackState != null ? fallbackState : new ThreeDSMainMenuState();
+                var menuState = fallbackState != null ? fallbackState : new TitleState();
                 CitroG.switchState(menuState);
             } catch (switchErr:Dynamic) {
                 appendGeneralLog("Critical Error: Failed to switch back to menu state: " + switchErr);

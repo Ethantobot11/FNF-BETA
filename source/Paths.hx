@@ -4,6 +4,7 @@ import sys.io.File;
 import sys.FileSystem;
 import haxe.Json;
 
+using StringTools;
 class Paths {
 	inline public static var SOUND_EXT = "cwav";
 	inline public static var VIDEO_EXT = "mp4";

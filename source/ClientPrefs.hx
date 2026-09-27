@@ -1,7 +1,7 @@
 package;
 
 import citro.CitroG;
-import haxe3ds.services.HIDKey;
+import haxe3ds.services.HID.HIDKey;
 import Controls;
 
 class ClientPrefs {

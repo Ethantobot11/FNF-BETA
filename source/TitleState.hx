@@ -13,13 +13,13 @@ import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
-import citro.backend.CitroEase;
+import citro.backend.CitroTween.CitroEase; 
 
 import haxe.Json;
 import sys.FileSystem;
 import sys.io.File;
 
-import options.GraphicsSettingsSubState;
+//import options.GraphicsSettingsSubState;
 
 using StringTools;
 

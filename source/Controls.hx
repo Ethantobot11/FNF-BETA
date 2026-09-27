@@ -1,7 +1,7 @@
 package;
 
 import haxe3ds.services.HID;
-import haxe3ds.services.HIDKey;
+import haxe3ds.services.HID.HIDKey;
 
 enum abstract Action(String) to String from String {
 	var UI_UP = "ui_up";

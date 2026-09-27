@@ -1,17 +1,10 @@
 package;
 
 import citro.object.CitroAnimate;
-import citro.math.CitroMath;
 import citro.CitroG;
+import citro.math.CitroMath;
 
 using StringTools;
-
-typedef EventNote = {
-	strumTime:Float,
-	event:String,
-	value1:String,
-	value2:String
-}
 
 class Note extends CitroAnimate
 {
@@ -34,11 +27,6 @@ class Note extends CitroAnimate
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
 	public var noteType(default, set):String = null;
-
-	public var eventName:String = '';
-	public var eventLength:Int = 0;
-	public var eventVal1:String = '';
-	public var eventVal2:String = '';
 
 	public var inEditor:Bool = false;
 	public var animSuffix:String = '';
@@ -118,7 +106,10 @@ class Note extends CitroAnimate
 	}
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false) {
-		super(0, 0, "");
+		super(""); // CitroAnimate only takes ceaFile:String
+		this.x = 0;
+		this.y = 0;
+		
 		if (prevNote == null) prevNote = this;
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
@@ -143,7 +134,7 @@ class Note extends CitroAnimate
 			if (prevNote.isSustainNote) prevNote.play(colArray[prevNote.noteData % 4] + 'hold');
 		} else if(!isSustainNote) {
 			earlyHitMult = 1;
-	}
+		}
 	}
 
 	public function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = '') {
@@ -171,8 +162,9 @@ class Note extends CitroAnimate
 		if(this.curAnim != null) this.play(this.curAnim);
 	}
 
-	override public function update(delta:Int):Bool {
-		var elapsed:Float = delta / 1000.0;
+	// CitroObject.update() takes NO arguments. We use CitroG.deltaTime instead.
+	override public function update():Bool {
+		var elapsed:Float = CitroG.deltaTime / 1000.0;
 		if (mustPress) {
 			canBeHit = (strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * lateHitMult) && strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult));
 			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit) tooLate = true;
@@ -183,6 +175,6 @@ class Note extends CitroAnimate
 			}
 		}
 		if (tooLate && !inEditor && this.alpha > 0.3) this.alpha = 0.3;
-		return super.update(delta);
+		return super.update();
 	}
 }

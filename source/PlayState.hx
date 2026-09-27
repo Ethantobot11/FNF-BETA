@@ -9,7 +9,7 @@ import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
-import citro.backend.CitroEase;
+import citro.backend.CitroTween.CitroEase; 
 
 import sys.io.File;
 import sys.FileSystem;
@@ -68,7 +68,9 @@ class PlayState extends MusicBeatState
 
 	public static var isPixelStage:Bool = false;
 	public static var daPixelZoom:Float = 6;
-	public static var SONG:Dynamic = null; // Replace with your SwagSong typedef
+	public static var SONG:SwagSong = null;
+	public static var isPixelStage:Bool = false;
+	public static var daPixelZoom:Float = 6;
 	public static var instance:PlayState;
 
 	override public function create():Void {
