@@ -20,7 +20,7 @@ import haxe.Json;
 import sys.FileSystem;
 import sys.io.File;
 
-//import options.GraphicsSettingsSubState;
+import GraphicsSettingsSubState;
 
 using StringTools;
 @:headerInclude("3ds.h")
@@ -96,7 +96,26 @@ class TitleState extends MusicBeatState
 
 		Highscore.load();
 
-		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'));
+		try {
+		    var jsonContent:String = Paths.getTextFromFile('images/gfDanceTitle.json');
+		    trace("JSON Content: " + jsonContent);
+		    trace("Content length: " + jsonContent.length);
+		    titleJSON = Json.parse(jsonContent);
+		    trace("JSON parsed successfully!");
+		} catch(e:Dynamic) {
+		    trace("ERROR parsing JSON: " + e);
+		    titleJSON = {
+		        titlex: -150,
+		        titley: -100,
+		        startx: 100,
+		        starty: 576,
+		        gfx: 512,
+		        gfy: 40,
+		        backgroundSprite: "",
+		        bpm: 102
+		    };
+		    trace("Using fallback values");
+		}
 
 		#if TITLE_SCREEN_EASTER_EGG
 		if (CitroG.save.data.psychDevsEasterEgg == null) CitroG.save.data.psychDevsEasterEgg = '';
