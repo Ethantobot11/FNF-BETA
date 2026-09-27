@@ -2,14 +2,16 @@ package;
 
 import citro.CitroG;
 import citro.object.CitroSprite;
+import citro.object.CitroAnimate;
 import citro.object.CitroText;
 import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTween;
 import citro.backend.CitroTimer;
+import WeekData;
 
 using StringTools;
-@:headerInclude("3ds.h")
+
 class StoryMenuState extends MusicBeatState
 {
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
@@ -30,10 +32,16 @@ class StoryMenuState extends MusicBeatState
 
 	var difficultySelectors:Array<CitroSprite> = [];
 	var sprDifficulty:CitroSprite;
-	var leftArrow:CitroSprite;
-	var rightArrow:CitroSprite;
+	var leftArrow:CitroAnimate;
+	var rightArrow:CitroAnimate;
 
 	var loadedWeeks:Array<WeekData> = [];
+
+	var lerpScore:Int = 0;
+	var intendedScore:Int = 0;
+	var movedBack:Bool = false;
+	var selectedWeek:Bool = false;
+	var stopspamming:Bool = false;
 
 	override function create():Void
 	{
@@ -50,7 +58,7 @@ class StoryMenuState extends MusicBeatState
 		scoreText.alignment = LEFT;
 		CitroG.state.members.push(scoreText);
 
-		txtWeekTitle = new CitroText(400 * 0.7, 10, "");
+		txtWeekTitle = new CitroText(CitroG.WIDTH * 0.7, 10, "");
 		txtWeekTitle.alignment = RIGHT;
 		txtWeekTitle.alpha = 0.7;
 		CitroG.state.members.push(txtWeekTitle);
@@ -64,7 +72,7 @@ class StoryMenuState extends MusicBeatState
 		bgSprite.antialiasing = ClientPrefs.globalAntialiasing;
 		CitroG.state.members.push(bgSprite);
 
-		var blackBarThingie:CitroSprite = new CitroSprite().makeGraphic(400, 56, CitroColor.BLACK);
+		var blackBarThingie:CitroSprite = new CitroSprite().makeGraphic(CitroG.WIDTH, 56, CitroColor.BLACK);
 		CitroG.state.members.push(blackBarThingie);
 
 		var num:Int = 0;
@@ -86,7 +94,7 @@ class StoryMenuState extends MusicBeatState
 
 				if (isLocked)
 				{
-					var lock:CitroSprite = new CitroSprite(weekThing.width + 10 + weekThing.x, weekThing.y);
+					var lock:CitroSprite = new CitroSprite(weekThing.x + weekThing.width + 10, weekThing.y);
 					lock.loadGraphic(Paths.image('campaign_menu_UI_assets'));
 					lock.antialiasing = ClientPrefs.globalAntialiasing;
 					grpLocks.push(lock);
@@ -102,7 +110,7 @@ class StoryMenuState extends MusicBeatState
 			for (char in 0...3)
 			{
 				if(char < charArray.length) {
-					var weekCharacterThing:MenuCharacter = new MenuCharacter((400 * 0.25) * (1 + char) - 150, charArray[char]);
+					var weekCharacterThing:MenuCharacter = new MenuCharacter((CitroG.WIDTH * 0.25) * (1 + char) - 150, charArray[char]);
 					weekCharacterThing.y += 70;
 					grpWeekCharacters.push(weekCharacterThing);
 					CitroG.state.members.push(weekCharacterThing);
@@ -110,9 +118,12 @@ class StoryMenuState extends MusicBeatState
 			}
 		}
 
-		leftArrow = new CitroSprite(0, 0);
-		leftArrow.loadGraphic(Paths.image('campaign_menu_UI_assets'));
+		// Use CitroAnimate for arrows so .play() works
+		leftArrow = new CitroAnimate(Paths.cea('campaign_menu_UI_assets'));
+		leftArrow.x = grpWeekText[0].x + grpWeekText[0].width + 10;
+		leftArrow.y = grpWeekText[0].y + 10;
 		leftArrow.antialiasing = ClientPrefs.globalAntialiasing;
+		leftArrow.play('idle');
 		difficultySelectors.push(leftArrow);
 		CitroG.state.members.push(leftArrow);
 
@@ -127,21 +138,23 @@ class StoryMenuState extends MusicBeatState
 		difficultySelectors.push(sprDifficulty);
 		CitroG.state.members.push(sprDifficulty);
 
-		rightArrow = new CitroSprite(leftArrow.x + 376, leftArrow.y);
-		rightArrow.loadGraphic(Paths.image('campaign_menu_UI_assets'));
+		rightArrow = new CitroAnimate(Paths.cea('campaign_menu_UI_assets'));
+		rightArrow.x = leftArrow.x + 376;
+		rightArrow.y = leftArrow.y;
 		rightArrow.antialiasing = ClientPrefs.globalAntialiasing;
+		rightArrow.play('idle');
 		difficultySelectors.push(rightArrow);
 		CitroG.state.members.push(rightArrow);
 
-		var bgYellow:CitroSprite = new CitroSprite(0, 56).makeGraphic(400, 386, 0xFFF9CF51);
+		var bgYellow:CitroSprite = new CitroSprite(0, 56).makeGraphic(CitroG.WIDTH, 386, 0xFFF9CF51);
 		CitroG.state.members.push(bgYellow);
 
-		var tracksSprite:CitroSprite = new CitroSprite(400 * 0.07, bgSprite.y + 425);
-        tracksSprite.loadGraphic(Paths.image('Menu_Tracks'));
+		var tracksSprite:CitroSprite = new CitroSprite(CitroG.WIDTH * 0.07, bgSprite.y + 425);
+		tracksSprite.loadGraphic(Paths.image('Menu_Tracks'));
 		tracksSprite.antialiasing = ClientPrefs.globalAntialiasing;
 		CitroG.state.members.push(tracksSprite);
 
-		txtTracklist = new CitroText(400 * 0.05, tracksSprite.y + 60, "");
+		txtTracklist = new CitroText(CitroG.WIDTH * 0.05, tracksSprite.y + 60, "");
 		txtTracklist.alignment = CENTER;
 		txtTracklist.color = 0xFFe55777;
 		CitroG.state.members.push(txtTracklist);
@@ -157,9 +170,6 @@ class StoryMenuState extends MusicBeatState
 		changeWeek();
 		super.closeSubState();
 	}
-
-	var lerpScore:Int = 0;
-	var intendedScore:Int = 0;
 
 	override function update(delta:Int):Void
 	{
@@ -180,12 +190,13 @@ class StoryMenuState extends MusicBeatState
 				SoundPlayer.playSound(Paths.sound('scrollMenu'));
 			}
 
-			if (controls.UI_RIGHT_P)
+			if (controls.UI_RIGHT_P) {
 				changeDifficulty(1);
-			else if (controls.UI_LEFT_P)
+			} else if (controls.UI_LEFT_P) {
 				changeDifficulty(-1);
-			else if (controls.UI_UP_P || controls.UI_DOWN_P)
+			} else if (controls.UI_UP_P || controls.UI_DOWN_P) {
 				changeDifficulty();
+			}
 
 			if(controls.RESET) {
 				persistentUpdate = false;
@@ -202,19 +213,20 @@ class StoryMenuState extends MusicBeatState
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
+		// Update arrow animations based on input
+		leftArrow.play(controls.UI_LEFT ? 'press' : 'idle');
+		rightArrow.play(controls.UI_RIGHT ? 'press' : 'idle');
+
 		super.update(delta);
 
+		// Update lock positions
 		for (i in 0...grpLocks.length) {
 			if(i < grpWeekText.length) {
 				grpLocks[i].y = grpWeekText[i].y;
-				grpLocks[i].visible = (grpLocks[i].y > 240 / 2);
+				grpLocks[i].visible = (grpLocks[i].y > CitroG.HEIGHT / 2);
 			}
 		}
 	}
-
-	var movedBack:Bool = false;
-	var selectedWeek:Bool = false;
-	var stopspamming:Bool = false;
 
 	function selectWeek():Void
 	{
@@ -225,6 +237,12 @@ class StoryMenuState extends MusicBeatState
 				SoundPlayer.playSound(Paths.sound('confirmMenu'));
 				grpWeekText[curWeek].startFlashing();
 				stopspamming = true;
+				
+				for (char in grpWeekCharacters) {
+					if (char.character != '' && char.hasConfirmAnimation) {
+						char.playAnim('confirm');
+					}
+				}
 			}
 
 			var songArray:Array<String> = [];
@@ -257,11 +275,31 @@ class StoryMenuState extends MusicBeatState
 	function changeDifficulty(change:Int = 0):Void
 	{
 		curDifficulty += change;
-		if (curDifficulty < 0) curDifficulty = CoolUtil.difficulties.length-1;
+		if (curDifficulty < 0) curDifficulty = CoolUtil.difficulties.length - 1;
 		if (curDifficulty >= CoolUtil.difficulties.length) curDifficulty = 0;
 
 		if(loadedWeeks.length > 0) WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 		lastDifficultyName = CoolUtil.difficulties[curDifficulty];
+
+		var diff:String = CoolUtil.difficulties[curDifficulty];
+		var newImagePath = Paths.image('menudifficulties/' + Paths.formatToSongPath(diff));
+
+		// Simple fade tween for difficulty selector
+		var props = new Map<String, Float>();
+		props.set("y", leftArrow.y + 15);
+		props.set("alpha", 1);
+		
+		sprDifficulty.loadGraphic(newImagePath);
+		sprDifficulty.x = leftArrow.x + 60;
+		sprDifficulty.x += (308 - sprDifficulty.width) / 3;
+		sprDifficulty.alpha = 0;
+		sprDifficulty.y = leftArrow.y - 15;
+
+		CitroTween.tweenObject(sprDifficulty, props, 0.07, {
+			onComplete: function() {
+				// Tween finished
+			}
+		});
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(loadedWeeks[curWeek].fileName, curDifficulty);
@@ -280,7 +318,7 @@ class StoryMenuState extends MusicBeatState
 		WeekData.setDirectoryFromWeek(leWeek);
 
 		txtWeekTitle.text = leWeek.storyName.toUpperCase();
-		txtWeekTitle.x = 400 - (txtWeekTitle.width + 10);
+		txtWeekTitle.x = CitroG.WIDTH - (txtWeekTitle.width + 10);
 
 		var bullShit:Int = 0;
 		var unlocked:Bool = !weekIsLocked(leWeek.fileName);
@@ -358,7 +396,7 @@ class StoryMenuState extends MusicBeatState
 		}
 		txtTracklist.text = txtTracklist.text.toUpperCase();
 		txtTracklist.screenCenter(X);
-		txtTracklist.x -= 400 * 0.35;
+		txtTracklist.x -= CitroG.WIDTH * 0.35;
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(loadedWeeks[curWeek].fileName, curDifficulty);

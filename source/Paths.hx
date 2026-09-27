@@ -5,6 +5,7 @@ import sys.FileSystem;
 import haxe.Json;
 
 using StringTools;
+
 class Paths {
 	inline public static var SOUND_EXT = "cwav";
 	inline public static var VIDEO_EXT = "mp4";
@@ -81,7 +82,6 @@ class Paths {
 		return 'romfs:/assets/videos/$key.$VIDEO_EXT';
 	}
 
-	// Returns file path for Citro's SoundPlayer or native audio loading
 	static public function sound(key:String, ?library:String):String {
 		return returnSoundPath('sounds', key, library);
 	}
@@ -104,18 +104,24 @@ class Paths {
 		return returnSoundPath('songs', songKey);
 	}
 
-	// Returns image path for CitroSprite.loadGraphic()
 	inline static public function image(key:String, ?library:String):String {
 		return returnGraphicPath(key, library);
 	}
 
-	// Returns .cea path for CitroAnimate (Replaces Sparrow XML)
 	inline static public function cea(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/$key.cea');
 		if(FileSystem.exists(ceaPath)) return ceaPath;
 		#end
 		return getPath('images/$key.cea', "TEXT", library);
+	}
+
+	inline static public function animateAtlas(key:String, ?library:String):String {
+		#if MODS_ALLOWED
+		var ceaPath = modFolders('images/' + key + '/Animation.cea');
+		if(FileSystem.exists(ceaPath)) return ceaPath;
+		#end
+		return getPath('images/' + key + '/Animation.cea', "TEXT", library);
 	}
 
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String {
@@ -125,8 +131,9 @@ class Paths {
 			return File.getContent(modFolders(key));
 		#end
 
-		if (FileSystem.exists(getPreloadPath(key)))
-			return File.getContent(getPreloadPath(key));
+		var fullPath = getPreloadPath(key);
+		if (FileSystem.exists(fullPath))
+			return File.getContent(fullPath);
 
 		if (currentLevel != null) {
 			var levelPath:String = '';
@@ -138,7 +145,9 @@ class Paths {
 			if (FileSystem.exists(levelPath)) return File.getContent(levelPath);
 		}
 		#end
-		return File.getContent(getPath(key, "TEXT"));
+		
+		trace("Warning: Text file not found, returning empty JSON: " + key);
+		return "{}"; 
 	}
 
 	inline static public function font(key:String):String {
@@ -196,7 +205,7 @@ class Paths {
 	}
 
 	#if MODS_ALLOWED
-	inline static public function mods(key:String = ''):String return 'mods/' + key;
+	inline static public function mods(key:String = ''):String return 'sdmc:/FNF-PE/mods/' + key;
 	inline static public function modsFont(key:String):String return modFolders('fonts/' + key);
 	inline static public function modsJson(key:String):String return modFolders('data/' + key + '.json');
 	inline static public function modsVideo(key:String):String return modFolders('videos/' + key + '.' + VIDEO_EXT);
@@ -212,7 +221,7 @@ class Paths {
 			var fileToCheck:String = mods(mod + '/' + key);
 			if(FileSystem.exists(fileToCheck)) return fileToCheck;
 		}
-		return 'mods/' + key;
+		return 'sdmc:/FNF-PE/mods/' + key;
 	}
 
 	public static var globalMods:Array<String> = [];
@@ -220,7 +229,7 @@ class Paths {
 
 	static public function pushGlobalMods():Array<String> {
 		globalMods = [];
-		var path:String = 'modsList.txt';
+		var path:String = 'sdmc:/FNF-PE/modsList.txt';
 		if(FileSystem.exists(path)) {
 			var list:Array<String> = CoolUtil.coolTextFile(path);
 			for (i in list) {

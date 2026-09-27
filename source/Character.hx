@@ -120,9 +120,13 @@ class Character extends CitroAnimate
 		var json:CharacterFile = cast Json.parse(rawJson);
 		imageFile = json.image;
 
-		// Load the Citro Engine Animation (.cea) file
-		var ceaPath = Paths.cea(json.image);
-		this.reloadCEA(ceaPath, "idle");
+		var animFolder:String = 'characters/' + curCharacter;
+		
+		if (Paths.fileExists(animFolder + '/Animation.cea', "TEXT")) {
+			this.reloadCEA(Paths.animateAtlas(animFolder), "idle");
+		} else {
+			this.reloadCEA(Paths.cea(animFolder + '/' + json.image), "idle");
+		}
 
 		if(json.scale != null && json.scale != 1) {
 			jsonScale = json.scale;

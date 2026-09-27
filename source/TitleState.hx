@@ -109,8 +109,8 @@ class TitleState extends MusicBeatState
 		#end
 
 		if(!initialized) {
-			//persistentUpdate = true;
-			//persistentDraw = true;
+			persistentUpdate = true;
+			persistentDraw = true;
 		}
 
 		if (CitroG.save.data.weekCompleted != null) {
@@ -154,7 +154,7 @@ class TitleState extends MusicBeatState
 		}
 
 		Conductor.changeBPM(titleJSON.bpm);
-		//persistentUpdate = true;
+		persistentUpdate = true;
 
 		var bg:CitroSprite = new CitroSprite();
         bg.loadGraphic(Paths.image('menuBG'));

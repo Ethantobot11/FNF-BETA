@@ -3,6 +3,7 @@ import subprocess
 import shutil
 import xml.etree.ElementTree as ET
 import math
+import json
 
 try:
     from PIL import Image
@@ -23,6 +24,94 @@ def get_tool_path(tool_name: str) -> str:
 def next_power_of_2(n: int) -> int:
     return 1 if n == 0 else 2**(math.ceil(math.log2(n)))
 
+def convert_animate_atlas(root, files, tex3ds_path):
+    """Converts AnimateAtlas (Texture Atlas) folders to .cea + .t3x"""
+    if "Animation.json" in files and "spritemap.json" in files and "spritemap.png" in files:
+        anim_json = os.path.join(root, "Animation.json")
+        sprite_json = os.path.join(root, "spritemap.json")
+        png_path = os.path.join(root, "spritemap.png")
+        t3x_path = os.path.join(root, "spritemap.t3x")
+        cea_path = os.path.join(root, "Animation.cea")
+
+        print(f"  [AnimateAtlas] Converting {root}...")
+
+        png_to_convert = png_path
+        if HAS_PILLOW:
+            try:
+                img = Image.open(png_path)
+                width, height = img.size
+                new_width = next_power_of_2(width)
+                new_height = next_power_of_2(height)
+                if new_width != width or new_height != height:
+                    print(f"    [!] Padding {png_path} to {new_width}x{new_height}")
+                    new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
+                    new_img.paste(img, (0, 0))
+                    png_to_convert = os.path.join(root, "spritemap_padded.png")
+                    new_img.save(png_to_convert)
+            except Exception as e:
+                print(f"    WARNING: Could not pad image: {e}")
+
+        try:
+            subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], 
+                          check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as e:
+            print(f"    ERROR: tex3ds failed on {png_to_convert}. ({e})")
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
+            return
+
+        try:
+            with open(sprite_json, 'r', encoding='utf-8') as f:
+                atlas_data = json.load(f)
+            with open(anim_json, 'r', encoding='utf-8-sig') as f: 
+                anim_data = json.load(f)
+        except Exception as e:
+            print(f"    ERROR: Failed to parse AnimateAtlas JSONs. ({e})")
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
+            return
+
+        sprite_coords = {}
+        if "ATLAS" in atlas_data and "SPRITES" in atlas_data["ATLAS"]:
+            for s in atlas_data["ATLAS"]["SPRITES"]:
+                spr = s["SPRITE"]
+                sprite_coords[spr["name"]] = spr
+
+        cea_lines = []
+        
+        if "SYMBOL_DICTIONARY" in anim_data and "Symbols" in anim_data["SYMBOL_DICTIONARY"]:
+            for symbol in anim_data["SYMBOL_DICTIONARY"]["Symbols"]:
+                sym_name = symbol.get("SYMBOL_name", "unknown")
+                
+                if "TIMELINE" in symbol and "LAYERS" in symbol["TIMELINE"]:
+                    for layer in symbol["TIMELINE"]["LAYERS"]:
+                        for frame in layer.get("Frames", []):
+                            frame_name = frame.get("name", sym_name)
+                            
+                            sprite_name = None
+                            if "elements" in frame and len(frame["elements"]) > 0:
+                                elem = frame["elements"][0]
+                                if "ATLAS_SPRITE_instance" in elem:
+                                    sprite_name = elem["ATLAS_SPRITE_instance"].get("name")
+                            
+                            if sprite_name and sprite_name in sprite_coords:
+                                coord = sprite_coords[sprite_name]
+                                cea_line = f"spritemap.t3x?{coord['x']}?{coord['y']}?{coord['w']}?{coord['h']}?0?0?{coord['w']}?{coord['h']}?{frame_name}"
+                                cea_lines.append(cea_line)
+
+        if cea_lines:
+            with open(cea_path, 'w', encoding='utf-8') as f:
+                f.write("\n".join(cea_lines) + "\n")
+            print(f"    SUCCESS: Generated Animation.cea and spritemap.t3x")
+            
+            os.remove(anim_json)
+            os.remove(sprite_json)
+            os.remove(png_path)
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
+        else:
+            print(f"    WARNING: No valid frames found in {root}")
+
 def main():
     os.makedirs("assets/romfs/haxe3ds", exist_ok=True)
     with open("assets/romfs/haxe3ds/version", "w") as f: 
@@ -31,6 +120,8 @@ def main():
     if not os.path.exists("assets"):
         print("No 'assets' directory found. Skipping conversion.")
         return
+
+    convert_animate_atlas(root, files, tex3ds_path)
 
     excluded_files = {
         os.path.normpath("assets/resources/audio.wav"),

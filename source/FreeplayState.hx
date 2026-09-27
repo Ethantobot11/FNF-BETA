@@ -6,9 +6,12 @@ import citro.object.CitroText;
 import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTween;
+import haxe3ds.services.HID;
+import haxe3ds.services.HID.HIDKey;
+import options.GameplayChangersSubstate;
 
 using StringTools;
-@:headerInclude("3ds.h")
+
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
@@ -32,7 +35,6 @@ class FreeplayState extends MusicBeatState
 	
 	override function create()
 	{
-		//persistentUpdate = true;
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
 
@@ -43,7 +45,6 @@ class FreeplayState extends MusicBeatState
 			for (song in leWeek.songs) {
 				var colors:Array<Int> = song[2];
 				if(colors == null || colors.length < 3) colors = [146, 113, 253];
-				// CitroColor equivalent of fromRGB
 				var col:CitroColor = (0xFF << 24) | (colors[0] << 16) | (colors[1] << 8) | colors[2];
 				addSong(song[0], i, song[1], col);
 			}
@@ -93,7 +94,7 @@ class FreeplayState extends MusicBeatState
 		textBG.alpha = 0.6;
 		CitroG.state.members.push(textBG);
 
-		var text:CitroText = new CitroText(textBG.x, textBG.y + 4, "A: Play | B: Back | X: Reset Score");
+		var text:CitroText = new CitroText(textBG.x, textBG.y + 4, "A: Play | B: Back | L: Gameplay Changers | X: Reset Score");
 		text.alignment = RIGHT;
 		CitroG.state.members.push(text);
 		
@@ -102,7 +103,6 @@ class FreeplayState extends MusicBeatState
 
 	override function closeSubState() {
 		changeSelection(0, false);
-		//persistentUpdate = true;
 		super.closeSubState();
 	}
 
@@ -130,7 +130,6 @@ class FreeplayState extends MusicBeatState
 		scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
 		positionHighscore();
 
-		// Ensure you have UI_UP_P (Just Pressed) in your Controls.hx, or use a custom tracker
 		var upP = controls.UI_UP_P; 
 		var downP = controls.UI_DOWN_P;
 		var accepted = controls.ACCEPT;
@@ -146,13 +145,16 @@ class FreeplayState extends MusicBeatState
 		else if (controls.UI_RIGHT_P) changeDiff(1);
 
 		if (back) {
-			//persistentUpdate = false;
 			SoundPlayer.playSound(Paths.sound('cancelMenu'));
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
+		// NEW: Open Gameplay Changers with the L button
+		if (HID.keyPressed(HIDKey.L)) {
+			openSubState(new GameplayChangersSubstate());
+		}
+
 		if (accepted) {
-			//persistentUpdate = false;
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			
@@ -163,7 +165,6 @@ class FreeplayState extends MusicBeatState
 			LoadingState.loadAndSwitchState(new PlayState());
 		}
 		else if(reset) {
-			//persistentUpdate = false;
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
 			SoundPlayer.playSound(Paths.sound('scrollMenu'));
 		}

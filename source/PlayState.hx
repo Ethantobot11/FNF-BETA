@@ -4,33 +4,32 @@ import citro.CitroG;
 import citro.state.CitroState;
 import citro.object.CitroSprite;
 import citro.object.CitroText;
-import citro.object.CitroCamera;
 import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
-
+import PauseSubState;
 import sys.io.File;
 import sys.FileSystem;
 import haxe.Json;
 import Section.SwagSection;
 import Song.SwagSong;
-import Note.EventNote;
 import Note;
 import NoteSplash;
 import Conductor.Rating;
 
 using StringTools;
-@:headerInclude("3ds.h")
+
 class PlayState extends MusicBeatState
 {
+    public static var STRUM_X:Float = 42;
+    public static var STRUM_X_MIDDLESCROLL:Float = -278;
+    
     public static var SONG:SwagSong = null;
     public static var isPixelStage:Bool = false;
     public static var daPixelZoom:Float = 6;
     public static var instance:PlayState;
     
-    public static var STRUM_X:Float = 42;
-    public static var STRUM_X_MIDDLESCROLL:Float = -278;
     public static var isStoryMode:Bool = false;
     public static var storyWeek:Int = 0;
     public static var storyPlaylist:Array<String> = [];
@@ -49,30 +48,28 @@ class PlayState extends MusicBeatState
         ['Sick!', 1], ['Perfect!!', 1]
     ];
 
-    public var ratingsData:Array<Conductor.Rating> = [];
+    public var ratingsData:Array<Rating> = [];
     public var playbackRate:Float = 1;
     public var songSpeed(default, set):Float = 1;
+    public var paused:Bool = false; // <-- ADDED PAUSED VARIABLE
     
     function set_songSpeed(value:Float):Float {
         songSpeed = value;
         return value;
     }
     
-    public var boyfriend:Character = null;
+    public var boyfriend:Boyfriend = null;
     public var dad:Character = null;
     public var gf:Character = null;
     
     public var notes:Array<Note> = [];
     public var unspawnNotes:Array<Note> = [];
-    //public var eventNotes:Array<EventNote> = [];
+    public var eventNotes:Array<EventNote> = [];
     
     public var strumLineNotes:Array<StrumNote> = [];
     public var opponentStrums:Array<StrumNote> = [];
     public var playerStrums:Array<StrumNote> = [];
     public var grpNoteSplashes:Array<NoteSplash> = [];
-    
-    public var camGame:CitroCamera;
-    public var camHUD:CitroCamera;
     
     public var health:Float = 1;
     public var combo:Int = 0;
@@ -106,10 +103,7 @@ class PlayState extends MusicBeatState
     public var instakillOnMiss:Bool = false;
     public var cpuControlled:Bool = false;
     public var practiceMode:Bool = false;
-    
-
     public var curStage:String = '';
-
     
     public var ratingName:String = '?';
     public var ratingPercent:Float = 0;
@@ -119,20 +113,10 @@ class PlayState extends MusicBeatState
         instance = this;
         Paths.clearStoredMemory();
         
-        // Setup ratings
         ratingsData.push(new Rating('sick'));
-        var good:Rating = new Rating('good');
-        good.ratingMod = 0.7;
-        good.score = 200;
-        ratingsData.push(good);
-        var bad:Rating = new Rating('bad');
-        bad.ratingMod = 0.4;
-        bad.score = 100;
-        ratingsData.push(bad);
-        var shit:Rating = new Rating('shit');
-        shit.ratingMod = 0;
-        shit.score = 50;
-        ratingsData.push(shit);
+        var good:Rating = new Rating('good'); good.ratingMod = 0.7; good.score = 200; ratingsData.push(good);
+        var bad:Rating = new Rating('bad'); bad.ratingMod = 0.4; bad.score = 100; ratingsData.push(bad);
+        var shit:Rating = new Rating('shit'); shit.ratingMod = 0; shit.score = 50; ratingsData.push(shit);
         
         if (SONG == null) SONG = Song.loadFromJson('tutorial');
         Conductor.mapBPMChanges(SONG);
@@ -141,8 +125,7 @@ class PlayState extends MusicBeatState
         curStage = SONG.stage != null ? SONG.stage : 'stage';
         isPixelStage = false;
         
-        // Load characters
-        boyfriend = new Boyfriend(770, 100, SONG.player1);
+        boyfriend = new Boyfriend(770, 100, SONG.player1, true);
         dad = new Character(100, 100, SONG.player2, false);
         gf = new Character(400, 130, SONG.gfVersion != null ? SONG.gfVersion : 'gf', false);
         
@@ -150,7 +133,6 @@ class PlayState extends MusicBeatState
         CitroG.state.members.push(dad);
         CitroG.state.members.push(boyfriend);
         
-        // UI
         healthBar = new SimpleBar(CitroG.WIDTH / 2 - 200, CitroG.HEIGHT * 0.89, 400, 20, CitroColor.WHITE);
         healthBar.maxValue = 2;
         healthBar.minValue = 0;
@@ -170,7 +152,6 @@ class PlayState extends MusicBeatState
         timeTxt.alignment = CENTER;
         CitroG.state.members.push(timeTxt);
         
-        // Generate song
         generateSong(SONG.song);
         generateStaticArrows(0);
         generateStaticArrows(1);
@@ -182,7 +163,8 @@ class PlayState extends MusicBeatState
     override public function update(delta:Int):Void {
         var elapsed:Float = delta / 1000.0;
         
-        if (startedCountdown) {
+        // 1. Advance time ONLY if not paused
+        if (startedCountdown && !paused) {
             Conductor.songPosition += elapsed * 1000 * playbackRate;
         }
         
@@ -190,8 +172,8 @@ class PlayState extends MusicBeatState
             startSong();
         }
         
-        // Spawn notes
-        if (unspawnNotes.length > 0) {
+        // 2. Spawn notes ONLY if not paused
+        if (unspawnNotes.length > 0 && !paused) {
             var time:Float = 2000 / songSpeed;
             while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time) {
                 var dunceNote:Note = unspawnNotes.shift();
@@ -201,8 +183,8 @@ class PlayState extends MusicBeatState
             }
         }
         
-        // Update notes
-        if (generatedMusic && !inCutscene) {
+        // 3. Update notes ONLY if not paused
+        if (generatedMusic && !inCutscene && !paused) {
             if(!cpuControlled) keyShit();
             
             var i = notes.length - 1;
@@ -230,24 +212,38 @@ class PlayState extends MusicBeatState
             }
         }
         
-        // Update UI
+        // Update UI positions
         if (healthBar != null) {
-            iconP1.x = healthBar.x + (healthBar.width * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) - 75;
+            var healthPercent = (healthBar.value - 0) * (0 - 1) / (2 - 0);
+            iconP1.x = healthBar.x + (healthBar.width * (healthPercent * 0.01)) - 75;
             iconP1.y = healthBar.y - 75;
-            iconP2.x = healthBar.x + (healthBar.width * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) + 75;
+            iconP2.x = healthBar.x + (healthBar.width * (healthPercent * 0.01)) + 75;
             iconP2.y = healthBar.y - 75;
         }
         
-        if (controls.PAUSE && startedCountdown) {
-            // Open pause menu
+        // 4. Open Pause Menu Logic
+        if (controls.PAUSE && startedCountdown && !paused && !endingSong && !inCutscene) {
+            openPauseMenu();
         }
         
         super.update(delta);
     }
     
+    // 5. Added openPauseMenu function
+    function openPauseMenu():Void {
+        paused = true;
+        persistentUpdate = false;
+        persistentDraw = true;
+        
+        // TODO: Hook this up to your actual MusicPlayer when ready
+        // MusicPlayer.pause();
+        
+        openSubState(new PauseSubState(boyfriend.x, boyfriend.y));
+    }
+    
     function startSong():Void {
         startingSong = false;
-        SoundPlayer.playSound(Paths.inst(SONG.song));
+        SoundPlayer.playSound(Paths.inst(SONG.song)); 
         songLength = 100000;
     }
     
@@ -270,7 +266,8 @@ class PlayState extends MusicBeatState
         unspawnNotes = [];
         
         for (section in songData.notes) {
-            for (songNotes in section.sectionNotes) {
+            var sectionNotes:Array<Dynamic> = cast section.sectionNotes;
+            for (songNotes in sectionNotes) {
                 var daStrumTime:Float = songNotes[0];
                 var daNoteData:Int = Std.int(songNotes[1] % 4);
                 var gottaHitNote:Bool = section.mustHitSection;
@@ -301,7 +298,7 @@ class PlayState extends MusicBeatState
         startedCountdown = true;
         Conductor.songPosition = -Conductor.crochet * 5;
         CitroTimer.start(Conductor.crochet / 1000 / playbackRate, function() {
-            // Countdown tick
+            // Countdown tick logic can go here
         }, 5);
     }
     
@@ -344,12 +341,7 @@ class PlayState extends MusicBeatState
     }
     
     function parseKeys():Array<Bool> {
-        return [
-            controls.NOTE_LEFT,
-            controls.NOTE_DOWN,
-            controls.NOTE_UP,
-            controls.NOTE_RIGHT
-        ];
+        return [controls.NOTE_LEFT, controls.NOTE_DOWN, controls.NOTE_UP, controls.NOTE_RIGHT];
     }
     
     function goodNoteHit(note:Note):Void {
@@ -444,10 +436,12 @@ class SimpleBar extends CitroSprite {
     public var minValue:Float = 0;
     private var _value:Float = 0;
     private var fullWidth:Float;
+    private var fullHeight:Float;
     
     public function new(x:Float, y:Float, fullWidth:Float, fullHeight:Float, color:CitroColor) {
         super(x, y);
         this.fullWidth = fullWidth;
+        this.fullHeight = fullHeight;
         this.makeGraphic(Std.int(fullWidth), Std.int(fullHeight), color);
     }
     
@@ -456,7 +450,7 @@ class SimpleBar extends CitroSprite {
         _value = val;
         var percent = (_value - minValue) / (maxValue - minValue);
         percent = CitroMath.clamp(percent, 0, 1);
-        this.setSourceRect(0, 0, Std.int(fullWidth * percent), this.height);
+        this.setSourceRect(0, 0, Std.int(fullWidth * percent), Std.int(fullHeight));
         return _value;
     }
 }
