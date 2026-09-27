@@ -54,14 +54,12 @@ class HealthIcon extends CitroSprite
 			}
 
 			this.loadGraphic(Paths.image(name));
-			
 			setLosing(false);
-			
 			this.char = newChar;
 		}
 	}
 
-	public function setLosing(losing:Bool):Void {		
+	public function setLosing(losing:Bool):Void {
 		var frameX:Float = losing ? 150 : 0;
 		var frameY:Float = 0;
 		this.setSourceRect(frameX, frameY, frameWidth, frameHeight);
