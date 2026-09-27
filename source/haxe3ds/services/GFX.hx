@@ -2,45 +2,26 @@ package haxe3ds.services;
 
 import haxe.Log;
 
-/**
- * Simple framebuffer API
- *
- * This API provides basic functionality needed to bring up framebuffers for both screens,
- * as well as managing display mode (stereoscopic 3D) and double buffering.
- * It is mainly an abstraction over the gsp service.
- *
- * Please note that the 3DS uses *portrait* screens rotated 90 degrees counterclockwise.
- * Width/height refer to the physical dimensions of the screen; that is, the top screen
- * is 240 pixels wide and 400 pixels tall; while the bottom screen is 240x320.
- */
 @:headerInclude("3ds.h")
 class GFX {
-	/**
-	 * Initializes the LCD framebuffers with default parameters.
-	 * 
-	 * This also replaces `haxe.Log.trace` to enable printing on SVC strings.
-	 */
 	public static inline extern function init() {
 		untyped __cpp__('gfxInitDefault()');
 
+		// Save the previous trace function (e.g., from CrashHandler)
+		var previousTrace = Log.trace;
+		
 		Log.trace = (v, ?infos) -> {
 			final str = Log.formatOutput(v, infos);
 			Sys.println(str);
 			SVC.debugString(str);
+			
+			// Call the previous trace function so CrashHandler still gets the data!
+			if (previousTrace != null) {
+				previousTrace(v, infos);
+			}
 		};
 	}
 
-	/**
-	 * Variable property for the GFX's 3D stereoscopic effect.
-	 * 
-	 * #### Note:
-	 * Default value for current3D is `false`/`disabled`.
-	 * 
-	 * #### Property:
-	 * `Get` will call `gfxIs3D` for it's variable.
-	 * 
-	 * `Set` will call `gfxSet3D` if variable is set.
-	 */
 	public static var current3D(get, set):Bool;
 	static function get_current3D():Bool {
 		return untyped __cpp__('gfxIs3D()');
@@ -50,21 +31,6 @@ class GFX {
 		return current3D;
 	}
 
-	/**
-	 * Variable property for the 3DS's wide screen resolution.
-	 * 
-	 * #### Note
-	 * Wide mode is disabled by default.
-	 * 
-	 * Wide and stereoscopic 3D modes are mutually exclusive.
-	 * 
-	 * In wide mode pixels are not square, since scanlines are half as tall as they normally are.
-	 * 
-	 * #### Property:
-	 * `Get` will call `gfxIsWide` for it's variable.
-	 * 
-	 * `Set` will call `gfxSetWide` with variable specified.
-	 */
 	public static var isWide(get, set):Bool;
 	static function get_isWide():Bool {
 		return untyped __cpp__('gfxIsWide()');
@@ -74,11 +40,6 @@ class GFX {
 		return isWide;
 	}
 
-	/**
-	 * Deinitializes and frees the LCD framebuffers.
-	 * 
-	 * This function internally calls gspExit.
-	 */
 	public static inline extern function exit() {
 		untyped __cpp__('gfxExit()');
 	}

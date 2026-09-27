@@ -65,7 +65,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				this.members.push(checkbox);
 			} else {
 				optionText.x -= 80;
-				optionText.startPosition.x -= 80;
+				optionText.startPositionX -= 80;
 				var valueText:CitroText = new CitroText(optionText.x + optionText.width + 80, optionText.y, '' + optionsArray[i].getValue());
 				valueText.alignment = LEFT;
 				grpTexts.push(valueText);

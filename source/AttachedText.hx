@@ -24,12 +24,8 @@ class AttachedText extends CitroText
 		if (sprTracker != null) {
 			this.x = sprTracker.x + offsetX;
 			this.y = sprTracker.y + offsetY;
-			if(copyVisible) {
-				this.visible = sprTracker.visible;
-			}
-			if(copyAlpha) {
-				this.alpha = sprTracker.alpha;
-			}
+			if(copyVisible) this.visible = sprTracker.visible;
+			if(copyAlpha) this.alpha = sprTracker.alpha;
 		}
 		return super.update();
 	}

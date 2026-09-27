@@ -35,7 +35,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 			if(optionsArray[i].type == 'bool') {
 				optionText.x += 110;
-				optionText.startPosition.x += 110;
+				optionText.startPositionX += 110;
 				optionText.snapToPosition();
 				var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, optionsArray[i].getValue() == true);
 				checkbox.sprTracker = optionText;

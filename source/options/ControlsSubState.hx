@@ -67,7 +67,7 @@ class ControlsSubState extends MusicBeatSubstate {
 			if(isCentered) {
 				optionText.x = (CitroG.WIDTH - optionText.width) / 2;
 				optionText.y -= 55;
-				optionText.startPosition.y -= 55;
+				optionText.startPositionY -= 55;
 			}
 			optionText.changeX = false;
 			optionText.distancePerItemY = 60;

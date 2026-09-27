@@ -21,28 +21,28 @@ class CrashHandler {
 
     public static function init() {
         try {
-            if (!FileSystem.isDirectory(logsDir)) {
-                FileSystem.createDirectory(logsDir);
-            }
-            if (!FileSystem.isDirectory(crashDir)) {
-                FileSystem.createDirectory(crashDir);
-            }
+            if (!FileSystem.exists(logsDir)) FileSystem.createDirectory(logsDir);
+            if (!FileSystem.exists(crashDir)) FileSystem.createDirectory(crashDir);
 
             logOutput = File.append(logPath, false);
-            logOutput.writeString("--- Citro Engine 3DS Session Started ---\n");
+            logOutput.writeString("\n--- Citro Engine 3DS Session Started: " + Date.now().toString() + " ---\n");
             logOutput.flush();
         } catch (e:Dynamic) {
-            trace("CRITICAL: Failed to initialize CrashHandler files: " + e);
+            Sys.println("CRITICAL: Failed to initialize CrashHandler files: " + e);
         }
 
         originalTrace = haxe.Log.trace;
+        
         haxe.Log.trace = function(v:Dynamic, ?infos:haxe.PosInfos) {
-            originalTrace(v, infos);
+            if (originalTrace != null) {
+                originalTrace(v, infos);
+            }
 
             var fileName = (infos != null && infos.fileName != null) ? infos.fileName : "Unknown";
             var lineNumber = (infos != null) ? infos.lineNumber : 0;
-            var msg = '[$fileName:$lineNumber]: $v\n';
+            var className = (infos != null && infos.className != null) ? infos.className : "Unknown";
             
+            var msg = '[${Date.now().toString()}] [$className:$fileName:$lineNumber]: $v\n';
             appendGeneralLog(msg);
         };
     }
@@ -59,13 +59,18 @@ class CrashHandler {
                 file.close();
             }
         } catch (e:Dynamic) {
-            originalTrace("Failed to write to general log: " + e);
+            Sys.println("Failed to write to general log: " + e);
         }
     }
 
     public static function logException(e:Dynamic, ?customMessage:String = "") {
         var stack = CallStack.toString(CallStack.exceptionStack());
-        var fullLog = '\n[CRASH/ERROR] $customMessage\nException: $e\nCallStack:\n$stack\n-------------------\n';
+        var fullLog = '\n========================================\n';
+        fullLog += '[CRASH/ERROR] ${Date.now().toString()}\n';
+        fullLog += 'Message: $customMessage\n';
+        fullLog += 'Exception: $e\n';
+        fullLog += 'CallStack:\n$stack\n';
+        fullLog += '========================================\n';
 
         try {
             var file = File.write(crashPath, false);
@@ -73,7 +78,7 @@ class CrashHandler {
             file.flush();
             file.close();
         } catch (err:Dynamic) {
-            originalTrace("Failed to write crash file: " + err);
+            Sys.println("Failed to write crash file: " + err);
         }
 
         appendGeneralLog(fullLog);
@@ -83,7 +88,7 @@ class CrashHandler {
         try {
             action();
         } catch (e:Dynamic) {
-            logException(e, "Runtime Crash Caught!");
+            logException(e, "Runtime Crash Caught in Protected Block!");
             
             try {
                 var menuState:CitroState = (fallbackState != null) ? cast(fallbackState, CitroState) : new TitleState();

@@ -1,35 +1,44 @@
 package;
 
-import citro.object.CitroText;
 import citro.object.CitroSprite;
+
+using StringTools;
 
 class AttachedSprite extends CitroSprite
 {
-	public var offsetX:Float = 0;
-	public var offsetY:Float = 0;
 	public var sprTracker:CitroSprite;
-	public var copyVisible:Bool = true;
-	public var copyAlpha:Bool = false;
+	public var xAdd:Float = 0;
+	public var yAdd:Float = 0;
+	public var angleAdd:Float = 0;
+	public var alphaMult:Float = 1;
 
-	public function new(text:String = "", ?offsetX:Float = 0, ?offsetY:Float = 0, ?bold:Bool = false, ?scale:Float = 1)
+	public var copyAngle:Bool = true;
+	public var copyAlpha:Bool = true;
+	public var copyVisible:Bool = false;
+
+	public function new(?file:String = null, ?anim:String = null, ?library:String = null, ?loop:Bool = false)
 	{
-		super(0, 0, text);
-		this.scale.set(scale, scale);
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
+		super(0, 0);
+		if(file != null) {
+			this.loadGraphic(Paths.image(file));
+		}
+		this.antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	override public function update():Bool
 	{
 		if (sprTracker != null) {
-			this.x = sprTracker.x + offsetX;
-			this.y = sprTracker.y + offsetY;
-			if(copyVisible) {
+			this.x = sprTracker.x + xAdd;
+			this.y = sprTracker.y + yAdd;
+
+			if(copyAngle)
+				this.angle = sprTracker.angle + angleAdd;
+
+			if(copyAlpha)
+				this.alpha = sprTracker.alpha * alphaMult;
+
+			if(copyVisible) 
 				this.visible = sprTracker.visible;
-			}
-			if(copyAlpha) {
-				this.alpha = sprTracker.alpha;
-			}
 		}
 		return super.update();
 	}

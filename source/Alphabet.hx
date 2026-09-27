@@ -9,7 +9,7 @@ using StringTools;
 
 enum Alignment { LEFT; CENTERED; RIGHT; }
 
-class Alphabet extends CitroObject {
+class Alphabet extends CitroSprite {
 	public var text(default, set):String;
 	public var bold:Bool = false;
 	public var letters:Array<AlphaCharacter> = [];
