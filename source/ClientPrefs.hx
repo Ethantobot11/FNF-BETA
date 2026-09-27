@@ -1,5 +1,6 @@
 package;
 
+import cpp.UInt32;
 import citro.CitroG;
 import haxe3ds.services.HID.HIDKey;
 import Controls;
@@ -53,7 +54,6 @@ class ClientPrefs {
 	public static var badWindow:Int = 135;
 	public static var safeFrames:Float = 10;
 
-	// Replaced FlxKey with HIDKey (UInt32) for 3DS button mapping
 	public static var keyBinds:Map<String, Array<UInt32>> = [
 		'note_left'		=> [HIDKey.A, HIDKey.LEFT],
 		'note_down'		=> [HIDKey.B, HIDKey.DOWN],

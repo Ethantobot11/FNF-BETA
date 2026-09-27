@@ -9,7 +9,7 @@ import citro.object.CitroText;
  */
 class CitroState {
 
-	public static var fpsText:CitroText;
+	//public static var fpsText:CitroText;
 	
 	/**
 	 * Lists of members currently added in this state.
@@ -26,11 +26,11 @@ class CitroState {
 	 * Constructor called when state is ready to be created.
 	 */
 	public function create() {
-	if (fpsText != null)
+	/*if (fpsText != null)
 	{
 		fpsText = new FPS();
 		add(fpsText);
-	}
+	}*/
 	};
 
 	/**
@@ -40,7 +40,7 @@ class CitroState {
 	 */
 	public function update(delta:Int) {
 		CrashHandler.protect(function() {
-		}, new ThreeDSMainMenuState());
+		}, new TitleState());
 	}
 
 	/**
