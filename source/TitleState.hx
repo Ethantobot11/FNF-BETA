@@ -123,7 +123,7 @@ class TitleState extends MusicBeatState
 		CitroG.switchState(new FreeplayState());
 		#else
 		if(CitroG.save.data.flashing == null && !FlashingState.leftState) {
-			CitroG.switchState(new FreeplayState());
+			CitroG.switchState(new FlashingState());
 		} else {
 			#if desktop
 			if (!DiscordClient.isInitialized) {
@@ -160,7 +160,7 @@ class TitleState extends MusicBeatState
 		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none") {
 			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
 		} else {
-			bg.makeGraphic(CitroG.TOP_WIDTH, CitroG.TOP_HEIGHT, CitroColor.BLACK);
+			bg.makeGraphic(WIDTH, HEIGHT, CitroColor.BLACK);
 		}
 		CitroG.state.members.push(bg);
 
@@ -203,7 +203,7 @@ class TitleState extends MusicBeatState
 		credGroup = [];
 		textGroup = [];
 
-		blackScreen = new CitroSprite().makeGraphic(CitroG.TOP_WIDTH, CitroG.TOP_HEIGHT, CitroColor.BLACK);
+		blackScreen = new CitroSprite().makeGraphic(WIDTH, HEIGHT, CitroColor.BLACK);
 		credGroup.push(blackScreen);
 		CitroG.state.members.push(blackScreen);
 
@@ -211,7 +211,7 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter(XY);
 		credTextShit.visible = false;
 
-		ngSpr = new CitroSprite(0, CitroG.TOP_HEIGHT * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		ngSpr = new CitroSprite(0, HEIGHT * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
 		CitroG.state.members.push(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.scale.set(0.8, 0.8);
@@ -276,7 +276,7 @@ class TitleState extends MusicBeatState
 				transitioning = true;
 				CitroTimer.start(1, function() {
 					if (mustUpdate) CitroG.switchState(new PlayState());
-					else CitroG.switchState(new PlayState());
+					else CitroG.switchState(new MainMenuState());
 					closedState = true;
 				});
 			}

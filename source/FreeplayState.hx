@@ -68,7 +68,7 @@ class FreeplayState extends MusicBeatState
 		}
 		WeekData.setDirectoryFromWeek();
 
-		scoreText = new CitroText(CitroG.TOP_WIDTH * 0.7, 5, "");
+		scoreText = new CitroText(WIDTH * 0.7, 5, "");
 		scoreText.alignment = RIGHT;
 		CitroG.state.members.push(scoreText);
 
@@ -88,7 +88,7 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		changeDiff();
 
-		var textBG:CitroSprite = new CitroSprite(0, CitroG.TOP_HEIGHT - 26).makeGraphic(CitroG.TOP_WIDTH, 26, CitroColor.BLACK);
+		var textBG:CitroSprite = new CitroSprite(0, HEIGHT - 26).makeGraphic(WIDTH, 26, CitroColor.BLACK);
 		textBG.alpha = 0.6;
 		CitroG.state.members.push(textBG);
 
@@ -214,9 +214,9 @@ class FreeplayState extends MusicBeatState
 	}
 
 	private function positionHighscore() {
-		scoreText.x = CitroG.TOP_WIDTH - scoreText.width - 6;
-		scoreBG.scale.x = CitroG.TOP_WIDTH - scoreText.x + 6;
-		scoreBG.x = CitroG.TOP_WIDTH - (scoreBG.scale.x / 2);
+		scoreText.x = WIDTH - scoreText.width - 6;
+		scoreBG.scale.x = WIDTH - scoreText.x + 6;
+		scoreBG.x = WIDTH - (scoreBG.scale.x / 2);
 		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
 		diffText.x -= diffText.width / 2;
 	}

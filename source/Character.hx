@@ -284,7 +284,8 @@ class Character extends CitroAnimate
 	{
 		var noteData:Array<Dynamic> = Song.loadFromJson('picospeaker', Paths.formatToSongPath(PlayState.SONG.song)).notes;
 		for (section in noteData) {
-			for (songNotes in section.sectionNotes) {
+			var sectionNotes:Array<Dynamic> = cast section.sectionNotes;
+			for (songNotes in sectionNotes) {
 				animationNotes.push(songNotes);
 			}
 		}

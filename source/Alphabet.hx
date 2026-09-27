@@ -127,7 +127,7 @@ class Alphabet extends CitroObject {
 				if (AlphaCharacter.allLetters.exists(character.toLowerCase()) && (!bold || !spaceChar)) {
 					if (consecutiveSpaces > 0) {
 						xPos += 28 * consecutiveSpaces * this.scale.x;
-						if(!bold && xPos >= CitroG.TOP_WIDTH * 0.65) {
+						if(!bold && xPos >= WIDTH * 0.65) {
 							xPos = 0;
 							rows++;
 						}

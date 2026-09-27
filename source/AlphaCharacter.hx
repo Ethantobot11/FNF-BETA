@@ -1,3 +1,10 @@
+package;
+
+import citro.object.CitroObject;
+import citro.object.CitroAnimate;
+import citro.math.CitroMath;
+import citro.CitroG;
+
 typedef Letter = {
 	?anim:Null<String>,
 	?offsets:Array<Float>,

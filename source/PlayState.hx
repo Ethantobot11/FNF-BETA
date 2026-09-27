@@ -46,6 +46,15 @@ class PlayState extends MusicBeatState
         ['Meh', 0.69], ['Nice', 0.7], ['Good', 0.8], ['Great', 0.9],
         ['Sick!', 1], ['Perfect!!', 1]
     ];
+
+    public var ratingsData:Array<Conductor.Rating> = [];
+    public var playbackRate:Float = 1;
+    public var songSpeed(default, set):Float = 1;
+    
+    function set_songSpeed(value:Float):Float {
+        songSpeed = value;
+        return value;
+    }
     
     public var boyfriend:Character = null;
     public var dad:Character = null;
@@ -146,7 +155,7 @@ class PlayState extends MusicBeatState
         CitroG.state.members.push(boyfriend);
         
         // UI
-        healthBar = new SimpleBar(CitroG.TOP_WIDTH / 2 - 200, CitroG.TOP_HEIGHT * 0.89, 400, 20, CitroColor.WHITE);
+        healthBar = new SimpleBar(WIDTH / 2 - 200, HEIGHT * 0.89, 400, 20, CitroColor.WHITE);
         healthBar.maxValue = 2;
         healthBar.minValue = 0;
         healthBar.value = 1;
@@ -161,7 +170,7 @@ class PlayState extends MusicBeatState
         scoreTxt.alignment = CENTER;
         CitroG.state.members.push(scoreTxt);
         
-        timeTxt = new CitroText(CitroG.TOP_WIDTH / 2 - 100, 19, "0:00");
+        timeTxt = new CitroText(WIDTH / 2 - 100, 19, "0:00");
         timeTxt.alignment = CENTER;
         CitroG.state.members.push(timeTxt);
         
@@ -403,7 +412,7 @@ class PlayState extends MusicBeatState
         totalPlayed++;
         RecalculateRating(false);
         
-        var ratingTxt = new CitroText(CitroG.TOP_WIDTH * 0.35, CitroG.TOP_HEIGHT * 0.4, daRating.name.toUpperCase());
+        var ratingTxt = new CitroText(WIDTH * 0.35, HEIGHT * 0.4, daRating.name.toUpperCase());
         ratingTxt.alignment = CENTER;
         CitroG.state.members.push(ratingTxt);
         
