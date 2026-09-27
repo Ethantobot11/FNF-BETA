@@ -243,7 +243,35 @@ def main():
     for root, name, ext, file_path in other_files:
         if not os.path.exists(file_path): continue
         
-        if ext == ".mp3" and os.path.normpath(file_path) not in excluded_files:
+        if ext == ".png":
+            t3x_path = os.path.join(root, name + ".t3x")
+            print(f"Converting standalone image {name}.png to .t3x...")
+            try:
+                png_to_convert = file_path
+                if HAS_PILLOW:
+                    try:
+                        img = Image.open(file_path)
+                        width, height = img.size
+                        new_width = next_power_of_2(width)
+                        new_height = next_power_of_2(height)
+                        if new_width != width or new_height != height:
+                            print(f"  [!] Padding {name}.png to {new_width}x{new_height}")
+                            new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
+                            new_img.paste(img, (0, 0))
+                            png_to_convert = os.path.join(root, name + "_padded.png")
+                            new_img.save(png_to_convert)
+                    except Exception as e:
+                        print(f"  WARNING: Could not pad image: {e}")
+
+                subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                os.remove(file_path)
+                if png_to_convert != file_path and os.path.exists(png_to_convert):
+                    os.remove(png_to_convert)
+                print(f"  SUCCESS: {name} converted to .t3x")
+            except Exception as e:
+                print(f"  ERROR converting {file_path} to .t3x: {e}")
+
+        elif ext == ".mp3" and os.path.normpath(file_path) not in excluded_files:
             out_path = os.path.join(root, name + ".ogg")
             try:
                 print(f"Converting {name}.mp3 to .ogg...")
@@ -252,7 +280,7 @@ def main():
             except Exception as e: 
                 print(f"Error converting {file_path} to OGG: {e}")
                 
-        elif ext in [".wav", ".ogg" ,".mp3"] and os.path.normpath(file_path) not in excluded_files:
+        elif ext in [".wav", ".ogg"] and os.path.normpath(file_path) not in excluded_files:
             out_path = os.path.join(root, name + ".cwav")
             try:
                 is_music = "music" in root.lower() or "song" in root.lower() or "voices" in root.lower() or "inst" in root.lower()
