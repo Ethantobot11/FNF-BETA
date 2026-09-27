@@ -70,9 +70,9 @@ class ClientPrefs {
 		'pause'			=> [HIDKey.START],
 		'reset'			=> [HIDKey.SELECT],
 		
-		'volume_mute'	=> [HIDKey.L],
+		'volume_mute'	=> [HIDKey.ZL],
 		'volume_up'		=> [HIDKey.R],
-		'volume_down'	=> [HIDKey.ZL], // New 3DS only, fallback handled in Controls
+		'volume_down'	=> [HIDKey.L], // New 3DS only, fallback handled in Controls
 		
 		'debug_1'		=> [HIDKey.L],
 		'debug_2'		=> [HIDKey.R]

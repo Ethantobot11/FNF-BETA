@@ -38,6 +38,7 @@ class Main
 
         //AchievementManager.unlock("play_DELTARUNE_3DS");
 
+        ClientPrefs.loadDefaultKeys();
         CitroGame.start(new TitleState());
         
         #else
