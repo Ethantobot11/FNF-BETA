@@ -121,8 +121,6 @@ def main():
         print("No 'assets' directory found. Skipping conversion.")
         return
 
-    convert_animate_atlas(root, files, tex3ds_path)
-
     excluded_files = {
         os.path.normpath("assets/resources/audio.wav"),
         os.path.normpath("assets/romfs/resources/audio.wav"),
@@ -141,6 +139,8 @@ def main():
     other_files = []
 
     for root, dirs, files in os.walk("assets"):
+        convert_animate_atlas(root, files, tex3ds_path)
+
         for file in files:
             file_path = os.path.join(root, file)
             name, ext = os.path.splitext(file)
