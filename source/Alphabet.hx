@@ -140,7 +140,7 @@ class Alphabet extends CitroObject {
 					letter.spawnX = letter.x;
 					letter.spawnY = letter.y;
 
-					xPos += letter.CitroG.WIDTH + letter.letterOffset[0] * this.scale.x;
+					xPos += letter.width + letter.letterOffset[0] * this.scale.x;
 					rowData[rows] = xPos;
 
 					letters.push(letter);

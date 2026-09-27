@@ -236,9 +236,9 @@ class PlayState extends MusicBeatState
         
         // Update UI
         if (healthBar != null) {
-            iconP1.x = healthBar.x + (healthBar.CitroG.WIDTH * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) - 75;
+            iconP1.x = healthBar.x + (healthBar.width * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) - 75;
             iconP1.y = healthBar.y - 75;
-            iconP2.x = healthBar.x + (healthBar.CitroG.WIDTH * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) + 75;
+            iconP2.x = healthBar.x + (healthBar.width * (CitroMath.remapToRange(healthBar.value, 0, 2, 1, 0) * 0.01)) + 75;
             iconP2.y = healthBar.y - 75;
         }
         
@@ -449,10 +449,10 @@ class SimpleBar extends CitroSprite {
     private var _value:Float = 0;
     private var fullWidth:Float;
     
-    public function new(x:Float, y:Float, CitroG.WIDTH:Float, CitroG.HEIGHT:Float, color:CitroColor) {
+    public function new(x:Float, y:Float, fullWidth:Float, fullHeight:Float, color:CitroColor) {
         super(x, y);
-        fullWidth = CitroG.WIDTH;
-        this.makeGraphic(Std.int(CitroG.WIDTH), Std.int(CitroG.HEIGHT), color);
+        this.fullWidth = fullWidth;
+        this.makeGraphic(Std.int(fullWidth), Std.int(fullHeight), color);
     }
     
     function get_value():Float return _value;
@@ -460,7 +460,7 @@ class SimpleBar extends CitroSprite {
         _value = val;
         var percent = (_value - minValue) / (maxValue - minValue);
         percent = CitroMath.clamp(percent, 0, 1);
-        this.setSourceRect(0, 0, Std.int(fullWidth * percent), this.CitroG.HEIGHT);
+        this.setSourceRect(0, 0, Std.int(fullWidth * percent), this.height);
         return _value;
     }
 }

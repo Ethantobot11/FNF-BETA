@@ -214,11 +214,11 @@ class FreeplayState extends MusicBeatState
 	}
 
 	private function positionHighscore() {
-		scoreText.x = CitroG.WIDTH - scoreText.CitroG.WIDTH - 6;
+		scoreText.x = CitroG.WIDTH - scoreText.width - 6;
 		scoreBG.scale.x = CitroG.WIDTH - scoreText.x + 6;
 		scoreBG.x = CitroG.WIDTH - (scoreBG.scale.x / 2);
-		diffText.x = Std.int(scoreBG.x + (scoreBG.CitroG.WIDTH / 2));
-		diffText.x -= diffText.CitroG.WIDTH / 2;
+		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
+		diffText.x -= diffText.width / 2;
 	}
 }
 

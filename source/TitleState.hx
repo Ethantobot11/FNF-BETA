@@ -140,7 +140,7 @@ class TitleState extends MusicBeatState
 		#end
 	}
 
-	var logoBl:CitroSprite;
+	var logoBl:CitroAnimate;
 	var gfDance:CitroAnimate;
 	var danceLeft:Bool = false;
 	var titleText:CitroAnimate;
@@ -159,8 +159,6 @@ class TitleState extends MusicBeatState
 		var bg:CitroSprite = new CitroSprite();
         bg.loadGraphic(Paths.image('menuBG'));
 		CitroG.state.members.push(bg);
-
-		gfDance = new CitroAnimate(titleJSON.gfx, titleJSON.gfy, Paths.cea('gfDanceTitle'));
 
         gfDance = new CitroAnimate(Paths.cea('gfDanceTitle'));
         gfDance.x = titleJSON.gfx;
@@ -208,7 +206,8 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter(XY);
 		credTextShit.visible = false;
 
-		ngSpr = new CitroSprite(0, CitroG.HEIGHT * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		ngSpr = new CitroSprite(0, CitroG.HEIGHT * 0.52);
+        ngSpr.loadGraphic(Paths.image('newgrounds_logo'));
 		CitroG.state.members.push(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.scale.set(0.8, 0.8);

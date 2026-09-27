@@ -77,7 +77,7 @@ class StoryMenuState extends MusicBeatState
 				loadedWeeks.push(weekFile);
 				WeekData.setDirectoryFromWeek(weekFile);
 				var weekThing:MenuItem = new MenuItem(0, bgSprite.y + 396, WeekData.weeksList[i]);
-				weekThing.y += ((weekThing.CitroG.HEIGHT + 20) * num);
+				weekThing.y += ((weekThing.height + 20) * num);
 				weekThing.targetY = num;
 				grpWeekText.push(weekThing);
 				CitroG.state.members.push(weekThing);
@@ -86,7 +86,7 @@ class StoryMenuState extends MusicBeatState
 
 				if (isLocked)
 				{
-					var lock:CitroSprite = new CitroSprite(weekThing.CitroG.WIDTH + 10 + weekThing.x, weekThing.y);
+					var lock:CitroSprite = new CitroSprite(weekThing.width + 10 + weekThing.x, weekThing.y);
 					lock.loadGraphic(Paths.image('campaign_menu_UI_assets'));
 					lock.antialiasing = ClientPrefs.globalAntialiasing;
 					grpLocks.push(lock);
@@ -279,7 +279,7 @@ class StoryMenuState extends MusicBeatState
 		WeekData.setDirectoryFromWeek(leWeek);
 
 		txtWeekTitle.text = leWeek.storyName.toUpperCase();
-		txtWeekTitle.x = 400 - (txtWeekTitle.CitroG.WIDTH + 10);
+		txtWeekTitle.x = 400 - (txtWeekTitle.width + 10);
 
 		var bullShit:Int = 0;
 		var unlocked:Bool = !weekIsLocked(leWeek.fileName);

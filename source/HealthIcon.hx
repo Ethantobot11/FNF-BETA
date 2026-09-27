@@ -27,7 +27,7 @@ class HealthIcon extends CitroAnimate
 	{
 		if (sprTracker != null) {
 			// Adjust position relative to the tracked object (e.g., HealthBar)
-			this.x = sprTracker.x + sprTracker.CitroG.WIDTH + 12;
+			this.x = sprTracker.x + sprTracker.width + 12;
 			this.y = sprTracker.y - 30;
 		}
 		return super.update(delta);
