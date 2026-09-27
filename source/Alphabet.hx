@@ -1,6 +1,6 @@
 package;
 
-import citro.object.CitroObject;
+import citro.object.CitroSprite;
 import citro.object.CitroAnimate;
 import citro.math.CitroMath;
 import citro.CitroG;
@@ -27,14 +27,13 @@ class Alphabet extends CitroSprite {
 	public var startPositionX:Float = 0;
 	public var startPositionY:Float = 0;
 
-	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true, ?bold:Bool = false) {
+	public function new(x:Float, y:Float, text:String = "", ?isBold:Bool = false) {
 		super();
 		this.x = x;
-        this.y = y;
-		this.bold = bold;
+		this.y = y;
+		this.bold = isBold;
 		this.startPositionX = x;
 		this.startPositionY = y;
-		this.bold = bold;
 		this.text = text;
 	}
 
@@ -64,15 +63,14 @@ class Alphabet extends CitroSprite {
 		}
 	}
 
-	private function set_text(newText:String):String
-    {
-        newText = newText.replace('\\n', '\n');
-        clearLetters();
-        createLetters(newText);
-        updateAlignment();
-        this.text = newText;
-        return newText;
-    }
+	private function set_text(newText:String):String {
+		newText = newText.replace('\\n', '\n');
+		clearLetters();
+		createLetters(newText);
+		updateAlignment();
+		this.text = newText;
+		return newText;
+	}
 
 	public function clearLetters() {
 		var i:Int = letters.length;
@@ -89,7 +87,7 @@ class Alphabet extends CitroSprite {
 		rows = 0;
 	}
 
-	override function update():Bool {
+	override public function update():Bool {
 		if (isMenuItem) {
 			var lerpVal:Float = CitroMath.clamp(CitroG.deltaTime * 9.6, 0, 1);
 			if(changeX) this.x = CitroMath.lerp(this.x, (targetY * distancePerItemX) + startPositionX, lerpVal);

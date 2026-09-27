@@ -1,6 +1,6 @@
 package;
 
-import citro.object.CitroObject;
+import citro.object.CitroSprite;
 import citro.object.CitroAnimate;
 import citro.math.CitroMath;
 import citro.CitroG;
@@ -45,7 +45,7 @@ class AlphaCharacter extends CitroAnimate {
 	public var rowWidth:Float = 0;
 
 	public function new(x:Float, y:Float, character:String, bold:Bool, parent:Alphabet) {
-		super(Paths.cea('alphabet'), ""); 
+		super(Paths.cea('alphabet'));
 		this.x = x;
 		this.y = y;
 		this.parent = parent;
@@ -80,11 +80,7 @@ class AlphaCharacter extends CitroAnimate {
 
 		var anim:String = alphaAnim + suffix;
 		
-		if (!play(anim)) {
-			if(suffix != ' bold') suffix = ' normal';
-			anim = 'question' + suffix;
-			play(anim);
-		}
+		this.play(anim);
 		
 		this.x += letterOffset[0] * parent.scale.x;
 		this.y -= letterOffset[1] * parent.scale.y;
