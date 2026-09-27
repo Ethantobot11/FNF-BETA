@@ -3,8 +3,6 @@ import subprocess
 import shutil
 import xml.etree.ElementTree as ET
 import math
-import json
-import re
 
 try:
     from PIL import Image
@@ -34,19 +32,23 @@ excluded_files = {
 }
 
 def fix_xml_escapes(file_path):
-    """Fix common XML escaping issues in Adobe Animate exports"""
+    """Safely fixes unescaped '&' characters in XML without breaking existing entities."""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        original_content = content
+        parts = content.split('&')
+        new_content = parts[0]
+        for part in parts[1:]:
+            if part.startswith(('amp;', 'lt;', 'gt;', 'quot;', 'apos;', '#')):
+                new_content += '&' + part
+            else:
+                new_content += '&amp;' + part
         
-        content = re.sub(r'&(?!amp;|lt;|gt;|quot;|apos;)', '&amp;', content)
-        
-        if content != original_content:
-            print(f"  [!] Fixed XML escaping issues in {os.path.basename(file_path)}")
+        if new_content != content:
+            print(f"  [!] Fixed unescaped '&' in {os.path.basename(file_path)}")
             with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(content)
+                f.write(new_content)
             return True
         return False
     except Exception as e:
@@ -85,7 +87,8 @@ def process_image_for_3ds(file_path, root, name):
 
 def main():
     os.makedirs("assets/romfs/haxe3ds", exist_ok=True)
-    with open("assets/romfs/haxe3ds/version", "w") as f: f.write("")
+    with open("assets/romfs/haxe3ds/version", "w") as f: 
+        f.write("")
 
     if not os.path.exists("assets"):
         print("No 'assets' directory found.")
@@ -106,7 +109,6 @@ def main():
             name, ext = os.path.splitext(file)
             if ext.lower() == ".xml":
                 if os.path.normpath(file_path) in excluded_files:
-                    print(f"Skipping excluded file: {file_path}")
                     continue
                 png_path = os.path.join(root, name + ".png")
                 if os.path.exists(png_path):
@@ -135,7 +137,7 @@ def main():
             continue
 
         print(f"  [2/3] Parsing XML and generating CEA...")
-        
+ 
         fix_xml_escapes(xml_path)
         
         try:
