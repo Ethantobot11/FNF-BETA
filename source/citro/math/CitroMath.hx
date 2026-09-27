@@ -80,4 +80,18 @@ class CitroMath {
 	public static function clamp(x:Float, min:Float = 0, max:Float = 1):Float {
 		return x > max ? max : x < min ? min : x;
 	}
+
+	/**
+	 * Remaps a value from one range to another.
+	 * 
+	 * @param Value The value to remap.
+	 * @param AMin The minimum value of the original range.
+	 * @param AMax The maximum value of the original range.
+	 * @param BMin The minimum value of the target range.
+	 * @param BMax The maximum value of the target range.
+	 * @return The remapped value.
+	 */
+	public static function remapToRange(Value:Float, AMin:Float, AMax:Float, BMin:Float, BMax:Float):Float {
+		return BMin + (Value - AMin) * (BMax - BMin) / (AMax - AMin);
+	}
 }

@@ -96,7 +96,6 @@ class PlayState extends MusicBeatState
     public var scoreTxt:CitroText;
     public var timeTxt:CitroText;
     
-    public var ratingsData:Array<Rating> = [];
     public var sicks:Int = 0;
     public var goods:Int = 0;
     public var bads:Int = 0;
@@ -108,14 +107,9 @@ class PlayState extends MusicBeatState
     public var cpuControlled:Bool = false;
     public var practiceMode:Bool = false;
     
-    public var songSpeed(default, set):Float = 1;
-    public var playbackRate:Float = 1;
+
     public var curStage:String = '';
-    
-    function set_songSpeed(value:Float):Float {
-        songSpeed = value;
-        return value;
-    }
+
     
     public var ratingName:String = '?';
     public var ratingPercent:Float = 0;
@@ -253,7 +247,7 @@ class PlayState extends MusicBeatState
     
     function startSong():Void {
         startingSong = false;
-        SoundPlayer.playMusic(Paths.inst(SONG.song));
+        SoundPlayer.play(Paths.inst(SONG.song));
         songLength = 100000;
     }
     

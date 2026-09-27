@@ -40,18 +40,6 @@ class Controls {
 		}
 	}
 
-    public var UI_UP_P(get, never):Bool;
-    inline function get_UI_UP_P() return check(Action.UI_UP);
-
-    public var UI_DOWN_P(get, never):Bool;
-    inline function get_UI_DOWN_P() return check(Action.UI_DOWN);
-
-    public var UI_LEFT_P(get, never):Bool;
-    inline function get_UI_LEFT_P() return check(Action.UI_LEFT);
-
-    public var UI_RIGHT_P(get, never):Bool;
-    inline function get_UI_RIGHT_P() return check(Action.UI_RIGHT);
-
 	public var UI_UP(get, never):Bool;
 	inline function get_UI_UP() return check(Action.UI_UP);
 
@@ -63,6 +51,18 @@ class Controls {
 
 	public var UI_DOWN(get, never):Bool;
 	inline function get_UI_DOWN() return check(Action.UI_DOWN);
+
+    public var NOTE_UP_P(get, never):Bool;
+    inline function get_NOTE_UP_P() return check(Action.NOTE_UP);
+
+    public var NOTE_DOWN_P(get, never):Bool;
+    inline function get_NOTE_DOWN_P() return check(Action.NOTE_DOWN);
+
+    public var NOTE_LEFT_P(get, never):Bool;
+    inline function get_NOTE_LEFT_P() return check(Action.NOTE_LEFT);
+
+    public var NOTE_RIGHT_P(get, never):Bool;
+    inline function get_NOTE_RIGHT_P() return check(Action.NOTE_RIGHT);
 
 	public var NOTE_UP(get, never):Bool;
 	inline function get_NOTE_UP() return check(Action.NOTE_UP);
