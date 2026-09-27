@@ -15,7 +15,9 @@ import sys.FileSystem;
 import haxe.Json;
 import Section.SwagSection;
 import Song.SwagSong;
-//import Note.EventNote;
+import Note.EventNote;
+import Note;
+import NoteSplash;
 import Conductor.Rating;
 
 using StringTools;
