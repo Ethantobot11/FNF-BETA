@@ -32,7 +32,7 @@ class FreeplayState extends MusicBeatState
 	
 	override function create()
 	{
-		persistentUpdate = true;
+		//persistentUpdate = true;
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
 
@@ -68,7 +68,7 @@ class FreeplayState extends MusicBeatState
 		}
 		WeekData.setDirectoryFromWeek();
 
-		scoreText = new CitroText(CitroG.width * 0.7, 5, "");
+		scoreText = new CitroText(CitroG.TOP_WIDTH * 0.7, 5, "");
 		scoreText.alignment = RIGHT;
 		CitroG.state.members.push(scoreText);
 
@@ -88,7 +88,7 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		changeDiff();
 
-		var textBG:CitroSprite = new CitroSprite(0, CitroG.height - 26).makeGraphic(CitroG.width, 26, CitroColor.BLACK);
+		var textBG:CitroSprite = new CitroSprite(0, CitroG.TOP_HEIGHT - 26).makeGraphic(CitroG.TOP_WIDTH, 26, CitroColor.BLACK);
 		textBG.alpha = 0.6;
 		CitroG.state.members.push(textBG);
 
@@ -101,7 +101,7 @@ class FreeplayState extends MusicBeatState
 
 	override function closeSubState() {
 		changeSelection(0, false);
-		persistentUpdate = true;
+		//persistentUpdate = true;
 		super.closeSubState();
 	}
 
@@ -145,13 +145,13 @@ class FreeplayState extends MusicBeatState
 		else if (controls.UI_RIGHT_P) changeDiff(1);
 
 		if (back) {
-			persistentUpdate = false;
+			//persistentUpdate = false;
 			SoundPlayer.playSound(Paths.sound('cancelMenu'));
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
 		if (accepted) {
-			persistentUpdate = false;
+			//persistentUpdate = false;
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			
@@ -162,7 +162,7 @@ class FreeplayState extends MusicBeatState
 			LoadingState.loadAndSwitchState(new PlayState());
 		}
 		else if(reset) {
-			persistentUpdate = false;
+			//persistentUpdate = false;
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
 			SoundPlayer.playSound(Paths.sound('scrollMenu'));
 		}
@@ -214,9 +214,9 @@ class FreeplayState extends MusicBeatState
 	}
 
 	private function positionHighscore() {
-		scoreText.x = CitroG.width - scoreText.width - 6;
-		scoreBG.scale.x = CitroG.width - scoreText.x + 6;
-		scoreBG.x = CitroG.width - (scoreBG.scale.x / 2);
+		scoreText.x = CitroG.TOP_WIDTH - scoreText.width - 6;
+		scoreBG.scale.x = CitroG.TOP_WIDTH - scoreText.x + 6;
+		scoreBG.x = CitroG.TOP_WIDTH - (scoreBG.scale.x / 2);
 		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
 		diffText.x -= diffText.width / 2;
 	}

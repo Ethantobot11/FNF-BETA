@@ -109,8 +109,8 @@ class TitleState extends MusicBeatState
 		#end
 
 		if(!initialized) {
-			persistentUpdate = true;
-			persistentDraw = true;
+			//persistentUpdate = true;
+			//persistentDraw = true;
 		}
 
 		if (CitroG.save.data.weekCompleted != null) {
@@ -154,19 +154,19 @@ class TitleState extends MusicBeatState
 		}
 
 		Conductor.changeBPM(titleJSON.bpm);
-		persistentUpdate = true;
+		//persistentUpdate = true;
 
 		var bg:CitroSprite = new CitroSprite();
 		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none") {
 			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
 		} else {
-			bg.makeGraphic(CitroG.width, CitroG.height, CitroColor.BLACK);
+			bg.makeGraphic(CitroG.TOP_WIDTH, CitroG.TOP_HEIGHT, CitroColor.BLACK);
 		}
 		CitroG.state.members.push(bg);
 
-		logoBl = new CitroAnimate(titleJSON.titlex, titleJSON.titley, Paths.cea('logoBumpin'));
-		gfDance.framerate = 24;
-		gfDance.looped = true;
+		logoBl = new CitroAnimate(Paths.cea('logoBumpin'));
+        logoBl.x = titleJSON.titlex;
+        logoBl.y = titleJSON.titley;
 		
 		//swagShader = new ColorSwap();
 		
@@ -195,14 +195,15 @@ class TitleState extends MusicBeatState
 		titleText.play('idle');
 		CitroG.state.members.push(titleText);
 
-		var logo:CitroSprite = new CitroSprite().loadGraphic(Paths.image('logo'));
+		var logo:CitroSprite = new CitroSprite();
+        logo.loadGraphic(Paths.image('logo'));
 		logo.screenCenter(XY);
 		CitroG.state.members.push(logo);
 
 		credGroup = [];
 		textGroup = [];
 
-		blackScreen = new CitroSprite().makeGraphic(CitroG.width, CitroG.height, CitroColor.BLACK);
+		blackScreen = new CitroSprite().makeGraphic(CitroG.TOP_WIDTH, CitroG.TOP_HEIGHT, CitroColor.BLACK);
 		credGroup.push(blackScreen);
 		CitroG.state.members.push(blackScreen);
 
@@ -210,7 +211,7 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter(XY);
 		credTextShit.visible = false;
 
-		ngSpr = new CitroSprite(0, CitroG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		ngSpr = new CitroSprite(0, CitroG.TOP_HEIGHT * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
 		CitroG.state.members.push(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.scale.set(0.8, 0.8);

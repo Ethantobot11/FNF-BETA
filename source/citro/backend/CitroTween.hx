@@ -259,7 +259,7 @@ class CitroTween {
 		return (1 - (t--) * (t) * (-2.70158 * t - 1.70158)) / 2 + .5;
 	}
 
-	static function applyEase(ease:CitroEase, t:Float):Float {
+	public static function applyEase(ease:CitroEase, t:Float):Float {
 		return switch(ease) {
 			case LINEAR: t;
 

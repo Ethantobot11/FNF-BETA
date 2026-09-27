@@ -15,7 +15,7 @@ class CustomFadeTransition extends CitroSubState {
 		super();
 		this.isTransIn = isTransIn;
 		
-		transBlack = new CitroSprite().makeGraphic(CitroG.width, CitroG.height, CitroColor.BLACK);
+		transBlack = new CitroSprite().makeGraphic(CitroG.TOP_WIDTH, CitroG.TOP_HEIGHT, CitroColor.BLACK);
 		this.members.push(transBlack);
 
 		if(isTransIn) {

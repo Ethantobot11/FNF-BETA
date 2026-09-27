@@ -30,7 +30,7 @@ class Alphabet extends CitroObject {
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true) {
 		super();
 		this.x = x;
-		this.y = y;
+        this.y = y;
 		this.startPositionX = x;
 		this.startPositionY = y;
 		this.bold = bold;
@@ -63,14 +63,15 @@ class Alphabet extends CitroObject {
 		}
 	}
 
-	private function set_text(newText:String):String {
-		newText = newText.replace('\\n', '\n');
-		clearLetters();
-		createLetters(newText);
-		updateAlignment();
-		this.text = newText;
-		return newText;
-	}
+	private function set_text(newText:String):String
+    {
+        newText = newText.replace('\\n', '\n');
+        clearLetters();
+        createLetters(newText);
+        updateAlignment();
+        this.text = newText;
+        return newText;
+    }
 
 	public function clearLetters() {
 		var i:Int = letters.length;
@@ -126,7 +127,7 @@ class Alphabet extends CitroObject {
 				if (AlphaCharacter.allLetters.exists(character.toLowerCase()) && (!bold || !spaceChar)) {
 					if (consecutiveSpaces > 0) {
 						xPos += 28 * consecutiveSpaces * this.scale.x;
-						if(!bold && xPos >= CitroG.width * 0.65) {
+						if(!bold && xPos >= CitroG.TOP_WIDTH * 0.65) {
 							xPos = 0;
 							rows++;
 						}
