@@ -1,6 +1,8 @@
 package;
 
 import citro.state.CitroState;
+import citro.state.CitroSubState;
+import PlayerSettings;     
 import citro.CitroG;
 
 class MusicBeatState extends CitroState {

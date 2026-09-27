@@ -86,7 +86,7 @@ class CrashHandler {
             logException(e, "Runtime Crash Caught!");
             
             try {
-                var menuState = fallbackState != null ? fallbackState : new TitleState();
+                var menuState:CitroState = (fallbackState != null) ? cast(fallbackState, CitroState) : new TitleState();
                 CitroG.switchState(menuState);
             } catch (switchErr:Dynamic) {
                 appendGeneralLog("Critical Error: Failed to switch back to menu state: " + switchErr);
