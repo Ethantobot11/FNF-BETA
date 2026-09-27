@@ -21,7 +21,7 @@ import NoteSplash;
 import Conductor.Rating;
 
 using StringTools;
-
+@:headerInclude("3ds.h")
 class PlayState extends MusicBeatState
 {
     public static var SONG:SwagSong = null;

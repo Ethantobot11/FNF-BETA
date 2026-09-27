@@ -9,7 +9,7 @@ import citro.backend.CitroTween;
 import citro.backend.CitroTimer;
 
 using StringTools;
-
+@:headerInclude("3ds.h")
 class StoryMenuState extends MusicBeatState
 {
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();

@@ -7,7 +7,7 @@ import citro.object.CitroText;
 import citro.backend.CitroColor;
 import citro.backend.CitroTween;
 import citro.backend.CitroTimer;
-
+@:headerInclude("3ds.h")
 class FlashingState extends MusicBeatState
 {
 	public static var leftState:Bool = false;

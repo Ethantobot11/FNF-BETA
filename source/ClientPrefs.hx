@@ -4,7 +4,7 @@ import cpp.UInt32;
 import citro.CitroG;
 import haxe3ds.services.HID.HIDKey;
 import Controls;
-
+@:headerInclude("3ds.h")
 class ClientPrefs {
 	public static var downScroll:Bool = false;
 	public static var middleScroll:Bool = false;

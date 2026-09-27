@@ -12,7 +12,7 @@ import citro.backend.CitroTween;
 import cpp.UInt32;
 
 using StringTools;
-
+@:headerInclude("3ds.h")
 class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '0.6.2';

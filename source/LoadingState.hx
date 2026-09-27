@@ -5,7 +5,7 @@ import citro.state.CitroState;
 import citro.object.CitroSprite;
 import citro.backend.CitroTimer;
 import citro.backend.CitroColor;
-
+@:headerInclude("3ds.h")
 class LoadingState extends MusicBeatState
 {
 	inline static var MIN_TIME = 4.0;

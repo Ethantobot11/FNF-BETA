@@ -8,7 +8,7 @@ import citro.backend.CitroColor;
 import citro.backend.CitroTween;
 
 using StringTools;
-
+@:headerInclude("3ds.h")
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];

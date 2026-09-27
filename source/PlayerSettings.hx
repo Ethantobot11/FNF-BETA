@@ -1,7 +1,7 @@
 package;
 
 import Controls;
-
+@:headerInclude("3ds.h")
 class PlayerSettings
 {
 	static public var numPlayers(default, null):Int = 0;

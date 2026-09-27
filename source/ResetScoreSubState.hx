@@ -8,7 +8,7 @@ import Controls;
 import PlayerSettings;
 
 using StringTools;
-
+@:headerInclude("3ds.h")
 class ResetScoreSubState extends CitroSubState
 {
 	var controls(get, never):Controls;

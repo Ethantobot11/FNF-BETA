@@ -4,7 +4,7 @@ import citro.state.CitroState;
 import citro.state.CitroSubState;
 import PlayerSettings;     
 import citro.CitroG;
-
+@:headerInclude("3ds.h")
 class MusicBeatState extends CitroState {
     public var persistentUpdate:Bool = true;
     public var persistentDraw:Bool = true;

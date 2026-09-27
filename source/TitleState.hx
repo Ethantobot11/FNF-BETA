@@ -23,7 +23,7 @@ import sys.io.File;
 //import options.GraphicsSettingsSubState;
 
 using StringTools;
-
+@:headerInclude("3ds.h")
 typedef TitleData = {
 	titlex:Float,
 	titley:Float,

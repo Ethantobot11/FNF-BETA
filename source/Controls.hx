@@ -17,7 +17,7 @@ enum abstract Action(String) to String from String {
 	var PAUSE = "pause";
 	var RESET = "reset";
 }
-
+@:headerInclude("3ds.h")
 class Controls {
 	public function new() {}
 
