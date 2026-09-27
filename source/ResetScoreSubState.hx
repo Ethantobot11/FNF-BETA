@@ -45,14 +45,14 @@ class ResetScoreSubState extends CitroSubState
 		var tooLong:Float = (name.length > 18) ? 0.8 : 1;
 		
 		var text1:Alphabet = new Alphabet(0, 180, "Reset the score of", true);
-		text1.screenCenter(X);
+		text1.x = (CitroG.WIDTH - text1.width) / 2;
 		alphabetArray.push(text1);
 		text1.alpha = 0;
 		this.members.push(text1);
 		
 		var text2:Alphabet = new Alphabet(0, text1.y + 90, name, true);
 		text2.scale.set(tooLong, tooLong);
-		text2.screenCenter(X);
+		text2.x = (CitroG.WIDTH - text2.width) / 2;
 		if(week == -1) text2.x += 60 * tooLong;
 		alphabetArray.push(text2);
 		text2.alpha = 0;
@@ -61,19 +61,20 @@ class ResetScoreSubState extends CitroSubState
 		if(week == -1) {
 			icon = new HealthIcon(character);
 			icon.scale.set(tooLong, tooLong);
-			icon.setPosition(text2.x - icon.width + (10 * tooLong), text2.y - 30);
+			
+			icon.x = text2.x - icon.width + (10 * tooLong);
+			icon.y = text2.y - 30;
+			
 			icon.alpha = 0;
 			this.members.push(icon);
 		}
 
 		yesText = new Alphabet(0, text2.y + 150, 'Yes', true);
-		yesText.screenCenter(X);
-		yesText.x -= 200;
+		yesText.x = ((CitroG.WIDTH - yesText.width) / 2) - 200;
 		this.members.push(yesText);
 		
 		noText = new Alphabet(0, text2.y + 150, 'No', true);
-		noText.screenCenter(X);
-		noText.x += 200;
+		noText.x = ((CitroG.WIDTH - noText.width) / 2) + 200;
 		this.members.push(noText);
 		
 		updateOptions();

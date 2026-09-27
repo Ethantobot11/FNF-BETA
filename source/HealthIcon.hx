@@ -1,27 +1,25 @@
 package;
 
-import citro.object.CitroAnimate;
+import citro.object.CitroSprite;
 import citro.object.CitroObject;
 import citro.CitroG;
-import sys.io.File;
 import sys.FileSystem;
 
 using StringTools;
 
-class HealthIcon extends CitroAnimate
+class HealthIcon extends CitroSprite
 {
 	public var sprTracker:CitroObject = null;
 	private var isOldIcon:Bool = false;
 	private var isPlayer:Bool = false;
 	private var char:String = '';
 
-	private var iconOffsets:Array<Float> = [0, 0];
+	private var frameWidth:Float = 150;
+	private var frameHeight:Float = 150;
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
-		super("");
-		this.x = 0;
-		this.y = 0;
+		super(0, 0);
 		this.isOldIcon = (char == 'bf-old');
 		this.isPlayer = isPlayer;
 		changeIcon(char);
@@ -46,24 +44,28 @@ class HealthIcon extends CitroAnimate
 		if(this.char != newChar) {
 			var name:String = 'icons/' + newChar;
 			
-			if(!FileSystem.exists(Paths.getPreloadPath('images/' + name + '.cea'))) {
+			var t3xPath:String = Paths.getPreloadPath('images/' + name + '.t3x');
+			if(!FileSystem.exists(t3xPath)) {
 				name = 'icons/icon-' + newChar;
+				t3xPath = Paths.getPreloadPath('images/' + name + '.t3x');
 			}
-			if(!FileSystem.exists(Paths.getPreloadPath('images/' + name + '.cea'))) {
+			if(!FileSystem.exists(t3xPath)) {
 				name = 'icons/icon-face';
 			}
 
-			var ceaFile:String = Paths.cea(name);
-			this.reloadCEA(ceaFile, "idle");
+			this.loadGraphic(Paths.image(name));
 			
-			iconOffsets[0] = 0; 
-			iconOffsets[1] = 0;
+			setLosing(false);
 			
 			this.char = newChar;
 		}
 	}
 
-	public function setLosing(losing:Bool):Void {
-		// this.frame = losing ? 1 : 0; // Uncomment if your .cea uses frames for losing state
+	public function setLosing(losing:Bool):Void {		
+		var frameX:Float = losing ? 150 : 0;
+		var frameY:Float = 0;
+		this.setSourceRect(frameX, frameY, frameWidth, frameHeight);
+		this.width = frameWidth;
+		this.height = frameHeight;
 	}
 }
