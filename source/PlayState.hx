@@ -142,7 +142,7 @@ class PlayState extends MusicBeatState
         isPixelStage = false;
         
         // Load characters
-        boyfriend = new Boyfriend(770, 100, SONG.player1, true);
+        boyfriend = new Boyfriend(770, 100, SONG.player1);
         dad = new Character(100, 100, SONG.player2, false);
         gf = new Character(400, 130, SONG.gfVersion != null ? SONG.gfVersion : 'gf', false);
         
@@ -247,7 +247,7 @@ class PlayState extends MusicBeatState
     
     function startSong():Void {
         startingSong = false;
-        SoundPlayer.play(Paths.inst(SONG.song));
+        SoundPlayer.playSound(Paths.inst(SONG.song));
         songLength = 100000;
     }
     
