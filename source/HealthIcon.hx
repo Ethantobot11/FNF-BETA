@@ -1,6 +1,7 @@
 package;
 
 import citro.object.CitroAnimate;
+import citro.object.CitroObject;
 import citro.CitroG;
 import sys.io.File;
 import sys.FileSystem;

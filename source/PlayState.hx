@@ -62,7 +62,7 @@ class PlayState extends MusicBeatState
     
     public var notes:Array<Note> = [];
     public var unspawnNotes:Array<Note> = [];
-    public var eventNotes:Array<EventNote> = [];
+    //public var eventNotes:Array<EventNote> = [];
     
     public var strumLineNotes:Array<StrumNote> = [];
     public var opponentStrums:Array<StrumNote> = [];

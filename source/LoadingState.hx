@@ -23,11 +23,11 @@ class LoadingState extends MusicBeatState
 	}
 
 	override function create() {
-		funkay = new CitroSprite(0, 0);
-        funkay.loadGraphic(Paths.image('funkay'));
+		var bg:CitroSprite = new CitroSprite(0, 0).makeGraphic(CitroG.WIDTH, CitroG.HEIGHT, 0xffcaff4d);
 		CitroG.state.members.push(bg);
 		
-		funkay = new CitroSprite(0, 0).loadGraphic(Paths.image('funkay'));
+		funkay = new CitroSprite(0, 0);
+        funkay.loadGraphic(Paths.image('funkay'));
 		funkay.scale.set(1, CitroG.HEIGHT / funkay.height);
 		funkay.screenCenter();
 		CitroG.state.members.push(funkay);

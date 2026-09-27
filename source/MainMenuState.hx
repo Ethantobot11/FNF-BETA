@@ -57,7 +57,8 @@ class MainMenuState extends MusicBeatState
 		bg.screenCenter();
 		CitroG.state.members.push(bg);
 
-		magenta = new CitroSprite(-80, 0).loadGraphic(Paths.image('menuDesat'));
+		magenta = new CitroSprite(-80, 0);
+        magenta.loadGraphic(Paths.image('menuBG'));
 		magenta.scale.set(1.175, 1.175);
 		magenta.screenCenter();
 		magenta.visible = false;
