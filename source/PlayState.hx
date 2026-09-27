@@ -125,7 +125,7 @@ class PlayState extends MusicBeatState
         curStage = SONG.stage != null ? SONG.stage : 'stage';
         isPixelStage = false;
         
-        boyfriend = new Boyfriend(770, 100, SONG.player1, true);
+        boyfriend = new Boyfriend(770, 100, SONG.player1);
         dad = new Character(100, 100, SONG.player2, false);
         gf = new Character(400, 130, SONG.gfVersion != null ? SONG.gfVersion : 'gf', false);
         
@@ -427,6 +427,46 @@ class PlayState extends MusicBeatState
         }
         if(ratingPercent >= 1) ratingName = ratingStuff[ratingStuff.length-1][0];
         scoreTxt.text = 'Score: $songScore | Misses: $songMisses | Rating: $ratingName';
+    }
+
+    public function clearNotesBefore(time:Float):Void {
+        var i:Int = unspawnNotes.length - 1;
+        while (i >= 0) {
+            var daNote:Note = unspawnNotes[i];
+            if(daNote.strumTime - 350 < time) {
+                daNote.active = false;
+                daNote.visible = false;
+                daNote.ignoreNote = true;
+                unspawnNotes.remove(daNote);
+                daNote.destroy();
+            }
+            --i;
+        }
+        i = notes.length - 1;
+        while (i >= 0) {
+            var daNote:Note = notes[i];
+            if(daNote.strumTime - 350 < time) {
+                daNote.active = false;
+                daNote.visible = false;
+                daNote.ignoreNote = true;
+                notes.remove(daNote);
+                daNote.destroy();
+            }
+            --i;
+        }
+    }
+
+    public function setSongTime(time:Float):Void {
+        if(time < 0) time = 0;
+        Conductor.songPosition = time;
+    }
+
+    public function finishSong(?ignoreNoteOffset:Bool = false):Void {
+        endingSong = true;
+    }
+
+    public static function cancelMusicFadeTween():Void {
+        // Stub for compatibility
     }
 }
 

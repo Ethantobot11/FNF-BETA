@@ -30,7 +30,7 @@ class StoryMenuState extends MusicBeatState
 	var grpWeekCharacters:Array<MenuCharacter> = [];
 	var grpLocks:Array<CitroSprite> = [];
 
-	var difficultySelectors:Array<CitroSprite> = [];
+	var difficultySelectors:Array<Dynamic> = [];
 	var sprDifficulty:CitroSprite;
 	var leftArrow:CitroAnimate;
 	var rightArrow:CitroAnimate;
@@ -240,7 +240,7 @@ class StoryMenuState extends MusicBeatState
 				
 				for (char in grpWeekCharacters) {
 					if (char.character != '' && char.hasConfirmAnimation) {
-						char.playAnim('confirm');
+						char.play('confirm');
 					}
 				}
 			}

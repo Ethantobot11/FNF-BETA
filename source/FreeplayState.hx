@@ -8,7 +8,7 @@ import citro.backend.CitroColor;
 import citro.backend.CitroTween;
 import haxe3ds.services.HID;
 import haxe3ds.services.HID.HIDKey;
-import options.GameplayChangersSubstate;
+import GameplayChangersSubstate;
 
 using StringTools;
 

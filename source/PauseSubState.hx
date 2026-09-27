@@ -6,7 +6,7 @@ import citro.object.CitroSprite;
 import citro.object.CitroText;
 import citro.backend.CitroColor;
 import citro.backend.CitroTween;
-import options.GameplayChangersSubstate;
+import GameplayChangersSubstate;
 
 using StringTools;
 
@@ -91,17 +91,17 @@ class PauseSubState extends MusicBeatSubstate
 		var propsInfo = new Map<String, Float>();
 		propsInfo.set("alpha", 1);
 		propsInfo.set("y", 20);
-		CitroTween.tweenObject(levelInfo, propsInfo, 0.4, {startDelay: 0.3});
+		CitroTween.tweenObject(levelInfo, propsInfo, 0.4);
 
 		var propsDiff = new Map<String, Float>();
 		propsDiff.set("alpha", 1);
 		propsDiff.set("y", levelDifficulty.y + 5);
-		CitroTween.tweenObject(levelDifficulty, propsDiff, 0.4, {startDelay: 0.5});
+		CitroTween.tweenObject(levelDifficulty, propsDiff, 0.4);
 
 		var propsBlue = new Map<String, Float>();
 		propsBlue.set("alpha", 1);
 		propsBlue.set("y", blueballedTxt.y + 5);
-		CitroTween.tweenObject(blueballedTxt, propsBlue, 0.4, {startDelay: 0.7});
+		CitroTween.tweenObject(blueballedTxt, propsBlue, 0.4);
 
 		regenMenu();
 	}
@@ -179,7 +179,7 @@ class PauseSubState extends MusicBeatSubstate
 				case 'Options':
 					closeSub();
 					// Opens the Gameplay Changers menu quickly as a substate
-					PlayState.instance.openSubState(new options.OptionsSubstate());
+					MusicBeatState.switchState(new options.OptionsState());
 				case "Restart Song":
 					restartSong();
 				case "Leave Charting Mode":

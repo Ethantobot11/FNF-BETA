@@ -1,10 +1,10 @@
 package;
 
-import citro.object.CitroSprite;
+import citro.object.CitroAnimate;
 import citro.object.CitroObject;
 import citro.CitroG;
 
-class CheckboxThingie extends CitroSprite
+class CheckboxThingie extends CitroAnimate
 {
 	public var sprTracker:CitroObject = null;
 	public var daValue(default, set):Bool;
@@ -12,11 +12,11 @@ class CheckboxThingie extends CitroSprite
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 
-	public function new(x:Float = 0, y:Float = 0, ?checked = false) {
-		super(x, y);
-		this.reloadCEA(Paths.cea('checkboxanim'), checked ? 'checking' : 'unchecking');
-		this.scale.set(0.9, 0.9);
-		animationFinished(checked ? 'checking' : 'unchecking');
+	public function new(x:Float = 0, y:Float = 0, ?checked:Bool = false) {
+		super(Paths.cea('checkboxanim'));
+		this.x = x;
+		this.y = y;
+		this.play(checked ? 'checking' : 'unchecking');
 		daValue = checked;
 	}
 
@@ -30,7 +30,7 @@ class CheckboxThingie extends CitroSprite
 		if (this.curAnim != null && this.finished) {
 			animationFinished(this.curAnim);
 		}
-
+		
 		return super.update();
 	}
 
@@ -45,7 +45,7 @@ class CheckboxThingie extends CitroSprite
 		return check;
 	}
 
-	private function animationFinished(name:String):Void {
+	private function animationFinished(name:String) {
 		switch(name) {
 			case 'checking': this.play('checked');
 			case 'unchecking': this.play('unchecked');

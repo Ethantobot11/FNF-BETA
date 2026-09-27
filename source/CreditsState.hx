@@ -234,34 +234,4 @@ class CreditsState extends MusicBeatState
 	}
 }
 
-// --- Helper Classes ---
-class AttachedSprite extends CitroSprite {
-	public var sprTracker:CitroObject = null;
-	public var xAdd:Float = 0;
-	public var yAdd:Float = 0;
-	public var alphaMult:Float = 1;
-	override public function update():Bool {
-		if (sprTracker != null) {
-			this.x = sprTracker.x + xAdd;
-			this.y = sprTracker.y + yAdd;
-			this.alpha = sprTracker.alpha * alphaMult;
-		}
-		return super.update();
-	}
-}
 
-class AttachedText extends CitroText {
-	public var sprTracker:CitroObject = null;
-	public var xAdd:Float = 0;
-	public var yAdd:Float = 0;
-	public var copyAlpha:Bool = false;
-	public var ID:Int = 0;
-	override public function update():Bool {
-		if (sprTracker != null) {
-			this.x = sprTracker.x + xAdd;
-			this.y = sprTracker.y + yAdd;
-			if (copyAlpha) this.alpha = sprTracker.alpha;
-		}
-		return super.update();
-	}
-}

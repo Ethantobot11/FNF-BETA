@@ -34,7 +34,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			CitroG.state.members.push(optionText);
 
 			if(optionsArray[i].type == 'bool') {
-				optionText.x += 110;
+				optionTextX += 110;
 				optionText.startPosition.x += 110;
 				optionText.snapToPosition();
 				var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, optionsArray[i].getValue() == true);
@@ -106,7 +106,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 							SoundPlayer.playSound(Paths.sound('scrollMenu'));
 						} else if(curOption.type != 'string') {
 							holdValue = Math.max(curOption.minValue, Math.min(curOption.maxValue, holdValue + curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1)));
-							curOption.setValue(curOption.type == 'int' ? Math.round(holdValue) : CitroMath.roundDecimal(hholdValue, curOption.decimals));
+							curOption.setValue(curOption.type == 'int' ? Math.round(holdValue) : CitroMath.roundDecimal(holdValue, curOption.decimals));
 							updateTextFrom(curOption);
 							curOption.change();
 						}

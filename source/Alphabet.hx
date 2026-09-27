@@ -19,7 +19,7 @@ class Alphabet extends CitroObject {
 	public var changeX:Bool = true;
 	public var changeY:Bool = true;
 
-	public var alignment(default, set):Alignment = LEFT;
+	public var alignment(default, set):Align = LEFT;
 	public var rows:Int = 0;
 
 	public var distancePerItemX:Float = 20;
@@ -40,7 +40,7 @@ class Alphabet extends CitroObject {
 	public function setAlignmentFromString(align:String) {
 		switch(align.toLowerCase().trim()) {
 			case 'right': alignment = RIGHT;
-			case 'center' | 'centered': alignment = CENTERED;
+			case 'center' | 'centered': alignment = CENTER;
 			default: alignment = LEFT;
 		}
 	}

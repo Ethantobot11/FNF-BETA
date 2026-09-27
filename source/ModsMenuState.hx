@@ -26,7 +26,7 @@ class ModsMenuState extends MusicBeatState
 	public static var defaultColor:CitroColor = 0xFF665AFF;
 
 	var modsList:Array<Dynamic> = [];
-	var visibleWhenNoMods:Array<CitroSprite> = []; // Using CitroSprite as base for visibility toggling
+	var visibleWhenNoMods:Array<Dynamic> = [];
 	var visibleWhenHasMods:Array<Dynamic> = [];
 
 	override function create():Void {
