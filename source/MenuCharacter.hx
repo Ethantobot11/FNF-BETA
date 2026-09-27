@@ -10,7 +10,7 @@ using StringTools;
 
 typedef MenuCharacterFile = {
 	var image:String;
-	var scale:Float;
+	var scale:Null<Float>;
 	var position:Array<Int>;
 	var idle_anim:String;
 	var confirm_anim:String;

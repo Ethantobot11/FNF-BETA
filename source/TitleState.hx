@@ -241,9 +241,7 @@ class TitleState extends MusicBeatState
 	{
 		var elapsed:Float = delta / 1000.0;
 
-		if (Conductor.songPosition != null) {
-			//Conductor.songPosition = YourMusicPlayer.getTime();
-		}
+		Conductor.songPosition += elapsed * 1000;
 
 		var pressedEnter:Bool = controls.ACCEPT; 
 

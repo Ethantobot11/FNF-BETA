@@ -12,13 +12,13 @@ using StringTools;
 typedef CharacterFile = {
 	var animations:Array<AnimArray>;
 	var image:String;
-	var scale:Float;
-	var sing_duration:Float;
+	var scale:Null<Float>;
+	var sing_duration:Null<Float>;
 	var healthicon:String;
 	var position:Array<Float>;
 	var camera_position:Array<Float>;
-	var flip_x:Bool;
-	var no_antialiasing:Bool;
+	var flip_x:Null<Bool>;
+	var no_antialiasing:Null<Bool>;
 	var healthbar_colors:Array<Int>;
 }
 

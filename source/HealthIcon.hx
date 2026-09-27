@@ -44,10 +44,10 @@ class HealthIcon extends CitroSprite
 		if(this.char != newChar) {
 			var name:String = 'icons/' + newChar;
 			
-			var t3xPath:String = Paths.getPreloadPath('images/' + name + '.t3x');
+			var t3xPath:String = Paths.fileExists('images/' + name + '.t3x');
 			if(!FileSystem.exists(t3xPath)) {
 				name = 'icons/icon-' + newChar;
-				t3xPath = Paths.getPreloadPath('images/' + name + '.t3x');
+				t3xPath = Paths.fileExists('images/' + name + '.t3x');
 			}
 			if(!FileSystem.exists(t3xPath)) {
 				name = 'icons/icon-face';
