@@ -8,7 +8,6 @@ import citro.object.CitroText;
 import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTween;
-import citro.backend.CitroEase;
 
 import cpp.UInt32;
 
@@ -52,7 +51,8 @@ class MainMenuState extends MusicBeatState
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
 		
-		var bg:CitroSprite = new CitroSprite(-80, 0).loadGraphic(Paths.image('menuBG'));
+		var bg:CitroSprite = new CitroSprite(-80, 0);
+        bg.loadGraphic(Paths.image('menuBG'));
 		bg.scale.set(1.175, 1.175);
 		bg.screenCenter();
 		CitroG.state.members.push(bg);
@@ -160,12 +160,10 @@ class MainMenuState extends MusicBeatState
 						{
 							var props = new Map<String, Float>();
 							props.set("alpha", 0);
-							CitroTween.tweenObject(spr, props, 0.4, {
-								ease: CitroEase.QUAD_OUT,
-								onComplete: function() {
-									spr.visible = false;
-								}
-							});
+							CitroTween.tweenObject(spr, props, 0.4, { 
+                            onComplete: function() { 
+                            spr.visible = false; } 
+                            });
 						}
 						else
 						{

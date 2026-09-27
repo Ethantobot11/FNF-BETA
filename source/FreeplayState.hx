@@ -50,7 +50,8 @@ class FreeplayState extends MusicBeatState
 		}
 		WeekData.loadTheFirstEnabledMod();
 
-		bg = new CitroSprite().loadGraphic(Paths.image('menuDesat'));
+		bg = new CitroSprite();
+		bg.loadGraphic(Paths.image('menuDesat'));
 		bg.screenCenter();
 		CitroG.state.members.push(bg);
 
@@ -169,15 +170,25 @@ class FreeplayState extends MusicBeatState
 		super.update(delta);
 	}
 
-	function changeDiff(change:Int = 0) {
+	public static function destroyFreeplayVocals():Void {
+		SoundPlayer.stopSound(Paths.voices(PlayState.SONG.song));
+	}
+
+	function changeDiff(change:Int = 0):Void {
 		curDifficulty += change;
-		if (curDifficulty < 0) curDifficulty = CoolUtil.difficulties.length-1;
-		if (curDifficulty >= CoolUtil.difficulties.length) curDifficulty = 0;
+
+		if (curDifficulty < 0)
+			curDifficulty = CoolUtil.difficulties.length - 1;
+		if (curDifficulty >= CoolUtil.difficulties.length)
+			curDifficulty = 0;
 
 		lastDifficultyName = CoolUtil.difficulties[curDifficulty];
+
+		#if !switch
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty);
-		
+		#end
+
 		PlayState.storyDifficulty = curDifficulty;
 		diffText.text = '< ' + CoolUtil.difficultyString() + ' >';
 		positionHighscore();

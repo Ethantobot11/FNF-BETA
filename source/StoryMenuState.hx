@@ -136,7 +136,8 @@ class StoryMenuState extends MusicBeatState
 		var bgYellow:CitroSprite = new CitroSprite(0, 56).makeGraphic(400, 386, 0xFFF9CF51);
 		CitroG.state.members.push(bgYellow);
 
-		var tracksSprite:CitroSprite = new CitroSprite(400 * 0.07, bgSprite.y + 425).loadGraphic(Paths.image('Menu_Tracks'));
+		var tracksSprite:CitroSprite = new CitroSprite(400 * 0.07, bgSprite.y + 425);
+        tracksSprite.loadGraphic(Paths.image('Menu_Tracks'));
 		tracksSprite.antialiasing = ClientPrefs.globalAntialiasing;
 		CitroG.state.members.push(tracksSprite);
 
