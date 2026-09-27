@@ -20,7 +20,7 @@ import haxe.Json;
 import sys.FileSystem;
 import sys.io.File;
 
-import GraphicsSettingsSubState;
+import options.GraphicsSettingsSubState;
 
 using StringTools;
 @:headerInclude("3ds.h")
