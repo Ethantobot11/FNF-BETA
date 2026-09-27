@@ -43,4 +43,11 @@ class MusicBeatSubstate extends CitroSubState
 	}
 
 	public function beatHit():Void {}
+
+	public function closeSub():Void {
+		if (CitroG.substate != null) {
+            CitroG.substate.destroy();
+            CitroG.substate = null;
+        }
+	}
 }

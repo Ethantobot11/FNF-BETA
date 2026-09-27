@@ -107,7 +107,7 @@ class GameOverSubstate extends MusicBeatSubstate
 	var isEnding:Bool = false;
 
 	function coolStartDeath(?volume:Float = 1):Void {
-		MusicPlayer.playMusic(Paths.music(loopSoundName)); // Hook up to your MusicPlayer
+		SoundPlayer.playSound(Paths.music(loopSoundName)); // Hook up to your MusicPlayer
 	}
 
 	function endBullshit():Void {

@@ -19,7 +19,7 @@ class Alphabet extends CitroObject {
 	public var changeX:Bool = true;
 	public var changeY:Bool = true;
 
-	public var alignment(default, set):Align = LEFT;
+	public var alignment(default, set):Alignment = LEFT;
 	public var rows:Int = 0;
 
 	public var distancePerItemX:Float = 20;
@@ -27,10 +27,11 @@ class Alphabet extends CitroObject {
 	public var startPositionX:Float = 0;
 	public var startPositionY:Float = 0;
 
-	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true) {
+	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true, ?bold:Bool = false) {
 		super();
 		this.x = x;
         this.y = y;
+		this.bold = bold;
 		this.startPositionX = x;
 		this.startPositionY = y;
 		this.bold = bold;
@@ -40,7 +41,7 @@ class Alphabet extends CitroObject {
 	public function setAlignmentFromString(align:String) {
 		switch(align.toLowerCase().trim()) {
 			case 'right': alignment = RIGHT;
-			case 'center' | 'centered': alignment = CENTER;
+			case 'center' | 'centered': alignment = CENTERED;
 			default: alignment = LEFT;
 		}
 	}
@@ -156,5 +157,9 @@ class Alphabet extends CitroObject {
 			letter.rowWidth = rowData[letter.row];
 		}
 		if(letters.length > 0) rows++;
+	}
+
+	public function startFlashing():Void {
+		// Stub for compatibility
 	}
 }

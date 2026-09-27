@@ -34,7 +34,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			CitroG.state.members.push(optionText);
 
 			if(optionsArray[i].type == 'bool') {
-				optionTextX += 110;
+				optionText.x += 110;
 				optionText.startPosition.x += 110;
 				optionText.snapToPosition();
 				var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, optionsArray[i].getValue() == true);

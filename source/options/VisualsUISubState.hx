@@ -39,7 +39,7 @@ class VisualsUISubState extends BaseOptionsMenu {
 
 	override public function destroy():Void {
 		if(changedMusic) {
-			MusicPlayer.playSound(Paths.music('freakyMenu'));
+			SoundPlayer.playSound(Paths.music('freakyMenu'));
 		}
 		super.destroy();
 	}

@@ -8,6 +8,8 @@ import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import sys.FileSystem;
 import sys.io.File;
+import AttachedSprite;
+import AttachedText;
 
 using StringTools;
 

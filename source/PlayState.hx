@@ -434,7 +434,7 @@ class PlayState extends MusicBeatState
         while (i >= 0) {
             var daNote:Note = unspawnNotes[i];
             if(daNote.strumTime - 350 < time) {
-                daNote.active = false;
+                //daNote.active = false;
                 daNote.visible = false;
                 daNote.ignoreNote = true;
                 unspawnNotes.remove(daNote);
@@ -446,7 +446,7 @@ class PlayState extends MusicBeatState
         while (i >= 0) {
             var daNote:Note = notes[i];
             if(daNote.strumTime - 350 < time) {
-                daNote.active = false;
+                //daNote.active = false;
                 daNote.visible = false;
                 daNote.ignoreNote = true;
                 notes.remove(daNote);

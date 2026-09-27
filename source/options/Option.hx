@@ -1,5 +1,7 @@
 package options;
 
+using StringTools;
+
 class Option {
 	private var child:Dynamic;
 	public var text(get, set):String;
