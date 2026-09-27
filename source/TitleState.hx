@@ -117,12 +117,12 @@ class TitleState extends MusicBeatState
 		}
 
 		#if FREEPLAY
-		CitroG.switchState(new PlayState());
+		CitroG.switchState(new FreeplayState());
 		#elseif CHARTING
-		CitroG.switchState(new PlayState());
+		CitroG.switchState(new FreeplayState());
 		#else
 		if(CitroG.save.data.flashing == null && !FlashingState.leftState) {
-			CitroG.switchState(new PlayState());
+			CitroG.switchState(new FreeplayState());
 		} else {
 			#if desktop
 			if (!DiscordClient.isInitialized) {
