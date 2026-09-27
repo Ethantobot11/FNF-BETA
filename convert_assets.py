@@ -12,6 +12,8 @@ except ImportError:
     HAS_PILLOW = False
     print("WARNING: Pillow not found. Install it via 'pip install Pillow' to fix texture dimension errors.")
 
+MAX_3DS_SAFE_SIZE = 1024
+
 def get_tool_path(tool_name: str) -> str:
     tool_path = shutil.which(tool_name)
     if tool_path: return tool_path
@@ -24,6 +26,43 @@ def get_tool_path(tool_name: str) -> str:
 def next_power_of_2(n: int) -> int:
     return 1 if n == 0 else 2**(math.ceil(math.log2(n)))
 
+def process_image_for_3ds(file_path, root, name):
+    """Automatically resizes images > 1024px and pads to Power of 2."""
+    if not HAS_PILLOW:
+        return file_path
+        
+    try:
+        img = Image.open(file_path)
+        width, height = img.size
+        
+        if width > MAX_3DS_SAFE_SIZE or height > MAX_3DS_SAFE_SIZE:
+            print(f"  [!] Resizing {name} from {width}x{height} to fit 3DS safe limit ({MAX_3DS_SAFE_SIZE}x{MAX_3DS_SAFE_SIZE})")
+            scale = MAX_3DS_SAFE_SIZE / max(width, height)
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            
+            try:
+                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            except AttributeError:
+                img = img.resize((new_width, new_height), Image.ANTIALIAS)
+            width, height = new_width, new_height
+
+        p2_width = next_power_of_2(width)
+        p2_height = next_power_of_2(height)
+
+        if p2_width != width or p2_height != height:
+            print(f"  [!] Padding {name} to {p2_width}x{p2_height} (3DS requires Power of 2)")
+            new_img = Image.new("RGBA", (p2_width, p2_height), (0, 0, 0, 0))
+            new_img.paste(img, (0, 0))
+            out_path = os.path.join(root, name + "_processed.png")
+            new_img.save(out_path)
+            return out_path
+
+        return file_path
+    except Exception as e:
+        print(f"  [!] ERROR processing image {name}: {e}")
+        return file_path
+
 def convert_animate_atlas(root, files, tex3ds_path):
     """Converts AnimateAtlas (Texture Atlas) folders to .cea + .t3x"""
     if "Animation.json" in files and "spritemap.json" in files and "spritemap.png" in files:
@@ -35,21 +74,7 @@ def convert_animate_atlas(root, files, tex3ds_path):
 
         print(f"  [AnimateAtlas] Converting {root}...")
 
-        png_to_convert = png_path
-        if HAS_PILLOW:
-            try:
-                img = Image.open(png_path)
-                width, height = img.size
-                new_width = next_power_of_2(width)
-                new_height = next_power_of_2(height)
-                if new_width != width or new_height != height:
-                    print(f"    [!] Padding {png_path} to {new_width}x{new_height}")
-                    new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
-                    new_img.paste(img, (0, 0))
-                    png_to_convert = os.path.join(root, "spritemap_padded.png")
-                    new_img.save(png_to_convert)
-            except Exception as e:
-                print(f"    WARNING: Could not pad image: {e}")
+        png_to_convert = process_image_for_3ds(png_path, root, "spritemap")
 
         try:
             subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], 
@@ -78,16 +103,13 @@ def convert_animate_atlas(root, files, tex3ds_path):
                 sprite_coords[spr["name"]] = spr
 
         cea_lines = []
-        
         if "SYMBOL_DICTIONARY" in anim_data and "Symbols" in anim_data["SYMBOL_DICTIONARY"]:
             for symbol in anim_data["SYMBOL_DICTIONARY"]["Symbols"]:
                 sym_name = symbol.get("SYMBOL_name", "unknown")
-                
                 if "TIMELINE" in symbol and "LAYERS" in symbol["TIMELINE"]:
                     for layer in symbol["TIMELINE"]["LAYERS"]:
                         for frame in layer.get("Frames", []):
                             frame_name = frame.get("name", sym_name)
-                            
                             sprite_name = None
                             if "elements" in frame and len(frame["elements"]) > 0:
                                 elem = frame["elements"][0]
@@ -162,22 +184,7 @@ def main():
         
         print(f"\nProcessing sprite sheet: {name}")
         
-        png_to_convert = png_path
-        if HAS_PILLOW:
-            try:
-                img = Image.open(png_path)
-                width, height = img.size
-                new_width = next_power_of_2(width)
-                new_height = next_power_of_2(height)
-                
-                if new_width != width or new_height != height:
-                    print(f"  [!] Padding {name} from {width}x{height} to {new_width}x{new_height} (3DS requires Power of 2)")
-                    new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
-                    new_img.paste(img, (0, 0))
-                    png_to_convert = os.path.join(root, name + "_padded.png")
-                    new_img.save(png_to_convert)
-            except Exception as e:
-                print(f"  WARNING: Could not check/Pad image with Pillow: {e}")
+        png_to_convert = process_image_for_3ds(png_path, root, name)
 
         print(f"  [1/3] Converting to {t3x_path} using tex3ds...")
         try:
@@ -247,22 +254,8 @@ def main():
             t3x_path = os.path.join(root, name + ".t3x")
             print(f"Converting standalone image {name}.png to .t3x...")
             try:
-                png_to_convert = file_path
-                if HAS_PILLOW:
-                    try:
-                        img = Image.open(file_path)
-                        width, height = img.size
-                        new_width = next_power_of_2(width)
-                        new_height = next_power_of_2(height)
-                        if new_width != width or new_height != height:
-                            print(f"  [!] Padding {name}.png to {new_width}x{new_height}")
-                            new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
-                            new_img.paste(img, (0, 0))
-                            png_to_convert = os.path.join(root, name + "_padded.png")
-                            new_img.save(png_to_convert)
-                    except Exception as e:
-                        print(f"  WARNING: Could not pad image: {e}")
-
+                png_to_convert = process_image_for_3ds(file_path, root, name)
+                
                 subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 os.remove(file_path)
                 if png_to_convert != file_path and os.path.exists(png_to_convert):
