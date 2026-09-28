@@ -293,6 +293,15 @@ def main():
                             print(f"  Removed: {file} (cea exists)")
                         except Exception as e:
                             print(f"  Warning: Could not remove {file}: {e}")
+
+                elif ext in [".mp3", ".wav", ".ogg"]:
+                    cwav_path = os.path.join(root, name + ".cwav")
+                    if os.path.exists(cwav_path):
+                        try:
+                            os.remove(file_path)
+                            print(f"  Removed: {file} (cwav exists)")
+                        except Exception as e:
+                            print(f"  Warning: Could not remove {file}: {e}")
         
         print("\n=== Conversion Complete ===")
 
