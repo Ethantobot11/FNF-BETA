@@ -266,5 +266,26 @@ def main():
                     print(f"  Error: {e}")
                     if os.path.exists(temp_wav): os.remove(temp_wav)
 
+        print("\n=== Final Cleanup Pass ===")
+        for root, dirs, files in os.walk("assets"):
+            for file in files:
+                file_path = os.path.join(root, file)
+                name, ext = os.path.splitext(file)
+                ext = ext.lower()
+                
+                if os.path.normpath(file_path) in excluded_files:
+                    continue
+                
+                if ext in [".mp3", ".wav", ".ogg"]:
+                    cwav_path = os.path.join(root, name + ".cwav")
+                    if os.path.exists(cwav_path):
+                        try:
+                            os.remove(file_path)
+                            print(f"  Removed: {file} (cwav exists)")
+                        except Exception as e:
+                            print(f"  Warning: Could not remove {file}: {e}")
+        
+        print("\n=== Conversion Complete ===")
+
 if __name__ == "__main__":
     main()
