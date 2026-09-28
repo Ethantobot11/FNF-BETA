@@ -57,7 +57,9 @@ class FreeplayState extends MusicBeatState
 		CitroG.state.members.push(bg);
 
 		for (i in 0...songs.length) {
-			var songText:Alphabet = new Alphabet(90, 320, songs[i].songName, true);
+			var songText:Alphabet = new Alphabet(0, 120, songs[i].songName, true);
+			songText.screenCenter(X);
+			songText.scale.set(0.5, 0.5);
 			songText.isMenuItem = true;
 			songText.targetY = i - curSelected;
 			grpSongs.push(songText);
@@ -65,20 +67,23 @@ class FreeplayState extends MusicBeatState
 
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
 			icon.sprTracker = songText;
+			icon.scale.set(0.5, 0.5);
 			iconArray.push(icon);
 			CitroG.state.members.push(icon);
 		}
 		WeekData.setDirectoryFromWeek();
 
-		scoreText = new CitroText(CitroG.WIDTH * 0.7, 5, "");
+		scoreText = new CitroText(CitroG.WIDTH - 10, 5, "");
 		scoreText.alignment = RIGHT;
+		scoreText.scale.set(0.5, 0.5);
 		CitroG.state.members.push(scoreText);
 
-		scoreBG = new CitroSprite(scoreText.x - 6, 0).makeGraphic(1, 66, CitroColor.BLACK);
+		scoreBG = new CitroSprite(scoreText.x - 6, 0).makeGraphic(1, 25, CitroColor.BLACK);
 		scoreBG.alpha = 0.6;
 		CitroG.state.members.push(scoreBG);
 
-		diffText = new CitroText(scoreText.x, scoreText.y + 36, "");
+		diffText = new CitroText(scoreText.x, scoreText.y + 12, "");
+		diffText.scale.set(0.5, 0.5);
 		CitroG.state.members.push(diffText);
 
 		if(curSelected >= songs.length) curSelected = 0;
@@ -90,12 +95,13 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		changeDiff();
 
-		var textBG:CitroSprite = new CitroSprite(0, CitroG.HEIGHT - 26).makeGraphic(CitroG.WIDTH, 26, CitroColor.BLACK);
+		var textBG:CitroSprite = new CitroSprite(0, CitroG.HEIGHT - 12).makeGraphic(CitroG.WIDTH, 12, CitroColor.BLACK);
 		textBG.alpha = 0.6;
 		CitroG.state.members.push(textBG);
 
-		var text:CitroText = new CitroText(textBG.x, textBG.y + 4, "A: Play | B: Back | L: Gameplay Changers | X: Reset Score");
-		text.alignment = RIGHT;
+		var text:CitroText = new CitroText(5, textBG.y + 1, "A:Play B:Back L:Changers X:Reset");
+		text.alignment = LEFT;
+		text.scale.set(0.35, 0.35);
 		CitroG.state.members.push(text);
 		
 		super.create();
@@ -127,7 +133,7 @@ class FreeplayState extends MusicBeatState
 		if(ratingSplit.length < 2) ratingSplit.push('');
 		while(ratingSplit[1].length < 2) ratingSplit[1] += '0';
 
-		scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		scoreText.text = 'BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
 		positionHighscore();
 
 		var upP = controls.UI_UP_P; 
@@ -149,7 +155,6 @@ class FreeplayState extends MusicBeatState
 			MusicBeatState.switchState(new MainMenuState());
 		}
 
-		// NEW: Open Gameplay Changers with the L button
 		if (HID.keyPressed(HIDKey.L)) {
 			openSubState(new GameplayChangersSubstate());
 		}
@@ -226,11 +231,11 @@ class FreeplayState extends MusicBeatState
 	}
 
 	private function positionHighscore() {
-		scoreText.x = CitroG.WIDTH - scoreText.width - 6;
-		scoreBG.scale.x = CitroG.WIDTH - scoreText.x + 6;
-		scoreBG.x = CitroG.WIDTH - (scoreBG.scale.x / 2);
-		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
-		diffText.x -= diffText.width / 2;
+		scoreText.x = CitroG.WIDTH - scoreText.width - 5;
+		scoreBG.x = scoreText.x - 5;
+		scoreBG.scale.x = CitroG.WIDTH - scoreBG.x;
+		
+		diffText.x = scoreText.x + (scoreText.width / 2) - (diffText.width / 2);
 	}
 }
 
