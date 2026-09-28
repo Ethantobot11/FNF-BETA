@@ -10,7 +10,26 @@ using StringTools;
 enum Alignment { LEFT; CENTERED; RIGHT; }
 
 class Alphabet extends CitroSprite {
-	public var text(default, set):String;
+	private var _text:String = "";
+	public var text(get, set):String;
+	private function get_text():String return _text;
+	private function set_text(newText:String):String {
+		_text = newText.replace('\\n', '\n');
+		clearLetters();
+		createLetters(_text);
+		updateAlignment();
+		return _text;
+	}
+
+	private var _alignment:Alignment = LEFT;
+	public var alignment(get, set):Alignment;
+	private function get_alignment():Alignment return _alignment;
+	private function set_alignment(align:Alignment):Alignment {
+		_alignment = align;
+		updateAlignment();
+		return align;
+	}
+
 	public var bold:Bool = false;
 	public var letters:Array<AlphaCharacter> = [];
 
@@ -19,7 +38,6 @@ class Alphabet extends CitroSprite {
 	public var changeX:Bool = true;
 	public var changeY:Bool = true;
 
-	public var alignment(default, set):Alignment = LEFT;
 	public var rows:Int = 0;
 
 	public var distancePerItemX:Float = 20;
@@ -45,31 +63,16 @@ class Alphabet extends CitroSprite {
 		}
 	}
 
-	private function set_alignment(align:Alignment):Alignment {
-		alignment = align;
-		updateAlignment();
-		return align;
-	}
-
 	private function updateAlignment() {
 		for (letter in letters) {
 			var newOffset:Float = 0;
-			switch(alignment) {
+			switch(_alignment) {
 				case CENTERED: newOffset = letter.rowWidth / 2;
 				case RIGHT: newOffset = letter.rowWidth;
 				default: newOffset = 0;
 			}
 			letter.alignOffset = newOffset;
 		}
-	}
-
-	private function set_text(newText:String):String {
-		newText = newText.replace('\\n', '\n');
-		clearLetters();
-		createLetters(newText);
-		updateAlignment();
-		this.text = newText;
-		return newText;
 	}
 
 	public function clearLetters() {
