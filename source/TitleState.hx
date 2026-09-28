@@ -73,7 +73,7 @@ class TitleState extends MusicBeatState
 
 		PlayerSettings.init();
 
-		// curWacky = CoolUtil.getRandomObject(getIntroTextShit()); // Adapt to your util
+		curWacky = CoolUtil.getRandomObject(getIntroTextShit());
 
 		//swagShader = new ColorSwap(); // Keep your custom shader class
 		super.create();
