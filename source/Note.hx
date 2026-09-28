@@ -42,7 +42,7 @@ class Note extends CitroAnimate
 	public var lateHitMult:Float = 1;
 	public var lowPriority:Bool = false;
 
-	public static var swagWidth:Float = 160 * 0.7;
+	public static var swagWidth:Float = 160 * 0.35;
 	private var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 
 	public var noteSplashDisabled:Bool = false;
