@@ -250,7 +250,7 @@ class PlayState extends MusicBeatState
         for (i in 0...4) {
             var babyArrow = new StrumNote(STRUM_X, 16, i, player);
             babyArrow.downScroll = ClientPrefs.downScroll;
-            babyArrow.scale.set(0.35, 0.35); 
+            babyArrow.scale.set(0.35, 0.35);
             strumLineNotes.push(babyArrow);
             CitroG.state.members.push(babyArrow);
             if (player == 1) playerStrums.push(babyArrow);
