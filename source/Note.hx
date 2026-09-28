@@ -157,13 +157,13 @@ class Note extends CitroAnimate
 		var currentAnim:String = this.curAnim != null ? this.curAnim : "idle";
 
 		if(PlayState.isPixelStage) {
-			var pixelPath = 'pixelUI/' + blahblah;
-			if(isSustainNote) pixelPath += 'ENDS';
-			this.reloadCEA(Paths.cea(pixelPath), currentAnim);
-			this.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
+		    var pixelPath = 'pixelUI/' + blahblah;
+		    if(isSustainNote) pixelPath += 'ENDS';
+		    this.reloadCEA(Paths.cea(pixelPath), currentAnim);
+		    this.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
 		} else {
-			this.reloadCEA(Paths.cea(blahblah), currentAnim);
-			this.scale.set(0.7, 0.7);
+		    this.reloadCEA(Paths.cea(blahblah), currentAnim);
+		    this.scale.set(0.35, 0.35);
 		}
 		if(isSustainNote) this.scale.y = lastScaleY;
 		if(this.curAnim != null) this.play(this.curAnim);
