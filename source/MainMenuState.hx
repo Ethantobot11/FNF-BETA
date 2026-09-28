@@ -53,19 +53,19 @@ class MainMenuState extends MusicBeatState
 		
 		var bg:CitroSprite = new CitroSprite(-80, 0);
         bg.loadGraphic(Paths.image('menuBG'));
-		bg.scale.set(1.175, 1.175);
+		bg.scale.set(0.5, 0.5);
 		bg.screenCenter();
 		CitroG.state.members.push(bg);
 
 		magenta = new CitroSprite(-80, 0);
         magenta.loadGraphic(Paths.image('menuBG'));
-		magenta.scale.set(1.175, 1.175);
+		magenta.scale.set(0.5, 0.5);
 		magenta.screenCenter();
 		magenta.visible = false;
 		magenta.color = 0xFFfd719b;
 		CitroG.state.members.push(magenta);
 
-		var scale:Float = 1;
+		var scale:Float = 0.5;
 
 		for (i in 0...optionShit.length)
 		{
@@ -87,10 +87,12 @@ class MainMenuState extends MusicBeatState
 
 		var versionShit:CitroText = new CitroText(12, 240 - 44, "Psych Engine v" + psychEngineVersion);
 		versionShit.alignment = LEFT;
+		versionShit.scale.set(0.5, 0.5);
 		CitroG.state.members.push(versionShit);
 		
 		var versionShit2:CitroText = new CitroText(12, 240 - 24, "Friday Night Funkin' v" + psychEngineVersion); // Fallback version
 		versionShit2.alignment = LEFT;
+		versionShit2.scale.set(0.5, 0.5);
 		CitroG.state.members.push(versionShit2);
 
 		changeItem();
