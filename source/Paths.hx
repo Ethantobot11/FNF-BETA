@@ -181,28 +181,21 @@ class Paths {
 			localTrackedAssets.push(modKeyT3x);
 			return modKeyT3x;
 		}
-		
-		var modKeyPng:String = modFolders('images/' + key + '.png');
-		if(FileSystem.exists(modKeyPng)) {
-			localTrackedAssets.push(modKeyPng);
-			return modKeyPng;
-		}
 		#end
 		
-		var pathT3x = getPath('images/$key.t3x', "IMAGE", library);
+		var pathT3x = getPath('images/$key.t3x', "BINARY", library);
+		if (pathT3x.startsWith("romfs:/")) {
+			localTrackedAssets.push(pathT3x);
+			return pathT3x;
+		}
+		
 		if (FileSystem.exists(pathT3x)) {
 			localTrackedAssets.push(pathT3x);
 			return pathT3x;
 		}
-
-		var pathPng = getPath('images/$key.png', "IMAGE", library);
-		if (FileSystem.exists(pathPng)) {
-			localTrackedAssets.push(pathPng);
-			return pathPng;
-		}
 		
-		trace('oh no its returning null NOOOO for image: $key');
-		return null;
+		trace('Warning: Could not verify image existence, returning path anyway: $key (tried $pathT3x)');
+		return pathT3x; // Return it anyway so the loader can try to open it
 	}
 
 	public static function returnSoundPath(path:String, key:String, ?library:String):String {
@@ -224,7 +217,7 @@ class Paths {
 	inline static public function modsJson(key:String):String return modFolders('data/' + key + '.json');
 	inline static public function modsVideo(key:String):String return modFolders('videos/' + key + '.' + VIDEO_EXT);
 	inline static public function modsSounds(path:String, key:String):String return modFolders(path + '/' + key + '.' + SOUND_EXT);
-	inline static public function modsImages(key:String):String return modFolders('images/' + key + '.png');
+	inline static public function modsImages(key:String):String return modFolders('images/' + key + '.t3x');
 
 	static public function modFolders(key:String):String {
 		if(currentModDirectory != null && currentModDirectory.length > 0) {
