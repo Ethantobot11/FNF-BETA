@@ -4,6 +4,7 @@ import shutil
 import xml.etree.ElementTree as ET
 import math
 import html
+import re
 
 try:
     from PIL import Image
@@ -39,20 +40,17 @@ def fix_xml_escapes(file_path):
             content = f.read()
         
         original_content = content
-        
         lines = content.split('\n')
         fixed_lines = []
         changes_made = False
         
         for line in lines:
             if '<SubTexture' in line:
-                import re
                 def escape_name_attr(match):
-                    full_match = match.group(0)
+                    nonlocal changes_made
                     name_value = match.group(1)
                     escaped = name_value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
                     if escaped != name_value:
-                        nonlocal changes_made
                         changes_made = True
                     return f'name="{escaped}"'
 
@@ -266,44 +264,44 @@ def main():
                     print(f"  Error: {e}")
                     if os.path.exists(temp_wav): os.remove(temp_wav)
 
-       print("\n=== Final Cleanup Pass ===")
-        for root, dirs, files in os.walk("assets"):
-            for file in files:
-                file_path = os.path.join(root, file)
-                name, ext = os.path.splitext(file)
-                ext = ext.lower()
-                
-                if os.path.normpath(file_path) in excluded_files:
-                    continue
+    print("\n=== Final Cleanup Pass ===")
+    for root, dirs, files in os.walk("assets"):
+        for file in files:
+            file_path = os.path.join(root, file)
+            name, ext = os.path.splitext(file)
+            ext = ext.lower()
+            
+            if os.path.normpath(file_path) in excluded_files:
+                continue
 
-                if ext == ".png":
-                    t3x_path = os.path.join(root, name + ".t3x")
-                    if os.path.exists(t3x_path):
-                        try:
-                            os.remove(file_path)
-                            print(f"  Removed: {file} (t3x exists)")
-                        except Exception as e:
-                            print(f"  Warning: Could not remove {file}: {e}")
-                
-                elif ext == ".xml":
-                    cea_path = os.path.join(root, name + ".cea")
-                    if os.path.exists(cea_path):
-                        try:
-                            os.remove(file_path)
-                            print(f"  Removed: {file} (cea exists)")
-                        except Exception as e:
-                            print(f"  Warning: Could not remove {file}: {e}")
+            if ext == ".png":
+                t3x_path = os.path.join(root, name + ".t3x")
+                if os.path.exists(t3x_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"  Removed: {file} (t3x exists)")
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {file}: {e}")
+            
+            elif ext == ".xml":
+                cea_path = os.path.join(root, name + ".cea")
+                if os.path.exists(cea_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"  Removed: {file} (cea exists)")
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {file}: {e}")
 
-                elif ext in [".mp3", ".wav", ".ogg"]:
-                    cwav_path = os.path.join(root, name + ".cwav")
-                    if os.path.exists(cwav_path):
-                        try:
-                            os.remove(file_path)
-                            print(f"  Removed: {file} (cwav exists)")
-                        except Exception as e:
-                            print(f"  Warning: Could not remove {file}: {e}")
-        
-        print("\n=== Conversion Complete ===")
+            elif ext in [".mp3", ".wav", ".ogg"]:
+                cwav_path = os.path.join(root, name + ".cwav")
+                if os.path.exists(cwav_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"  Removed: {file} (cwav exists)")
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {file}: {e}")
+    
+    print("\n=== Conversion Complete ===")
 
 if __name__ == "__main__":
     main()
