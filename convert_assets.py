@@ -79,8 +79,10 @@ def process_image_for_3ds(file_path, root, name):
         return file_path
     try:
         img = Image.open(file_path)
+        if img.mode != 'RGBA':
+            print(f"  [!] Converting {name} color profile to standard RGBA")
+            img = img.convert('RGBA')
         width, height = img.size
-        
         if width > MAX_3DS_SAFE_SIZE or height > MAX_3DS_SAFE_SIZE:
             print(f"  [!] Resizing {name} from {width}x{height} to fit 3DS safe limit")
             scale = MAX_3DS_SAFE_SIZE / max(width, height)
@@ -88,16 +90,18 @@ def process_image_for_3ds(file_path, root, name):
             new_height = int(height * scale)
             img = img.resize((new_width, new_height), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
             width, height = new_width, new_height
-
         p2_width = next_power_of_2(width)
         p2_height = next_power_of_2(height)
-
         if p2_width != width or p2_height != height:
             print(f"  [!] Padding {name} to {p2_width}x{p2_height}")
             new_img = Image.new("RGBA", (p2_width, p2_height), (0, 0, 0, 0))
             new_img.paste(img, (0, 0))
             out_path = os.path.join(root, name + "_processed.png")
             new_img.save(out_path)
+            return out_path
+        if img.mode == 'RGBA' and img.filename != file_path:
+            out_path = os.path.join(root, name + "_rgba.png")
+            img.save(out_path)
             return out_path
         return file_path
     except Exception as e:
