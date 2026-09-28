@@ -266,7 +266,7 @@ def main():
                     print(f"  Error: {e}")
                     if os.path.exists(temp_wav): os.remove(temp_wav)
 
-        print("\n=== Final Cleanup Pass ===")
+       print("\n=== Final Cleanup Pass ===")
         for root, dirs, files in os.walk("assets"):
             for file in files:
                 file_path = os.path.join(root, file)
@@ -275,13 +275,22 @@ def main():
                 
                 if os.path.normpath(file_path) in excluded_files:
                     continue
-                
-                if ext in [".mp3", ".wav", ".ogg"]:
-                    cwav_path = os.path.join(root, name + ".cwav")
-                    if os.path.exists(cwav_path):
+
+                if ext == ".png":
+                    t3x_path = os.path.join(root, name + ".t3x")
+                    if os.path.exists(t3x_path):
                         try:
                             os.remove(file_path)
-                            print(f"  Removed: {file} (cwav exists)")
+                            print(f"  Removed: {file} (t3x exists)")
+                        except Exception as e:
+                            print(f"  Warning: Could not remove {file}: {e}")
+                
+                elif ext == ".xml":
+                    cea_path = os.path.join(root, name + ".cea")
+                    if os.path.exists(cea_path):
+                        try:
+                            os.remove(file_path)
+                            print(f"  Removed: {file} (cea exists)")
                         except Exception as e:
                             print(f"  Warning: Could not remove {file}: {e}")
         
