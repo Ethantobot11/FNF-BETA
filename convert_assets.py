@@ -3,6 +3,7 @@ import subprocess
 import shutil
 import xml.etree.ElementTree as ET
 import math
+import html
 
 try:
     from PIL import Image
@@ -32,27 +33,45 @@ excluded_files = {
 }
 
 def fix_xml_escapes(file_path):
-    """Safely fixes unescaped '&' characters in XML without breaking existing entities."""
+    """Fix all XML escaping issues in Adobe Animate exports"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        parts = content.split('&')
-        new_content = parts[0]
-        for part in parts[1:]:
-            if part.startswith(('amp;', 'lt;', 'gt;', 'quot;', 'apos;', '#')):
-                new_content += '&' + part
-            else:
-                new_content += '&amp;' + part
+        original_content = content
         
-        if new_content != content:
-            print(f"  [!] Fixed unescaped '&' in {os.path.basename(file_path)}")
+        lines = content.split('\n')
+        fixed_lines = []
+        changes_made = False
+        
+        for line in lines:
+            if '<SubTexture' in line:
+                import re
+                def escape_name_attr(match):
+                    full_match = match.group(0)
+                    name_value = match.group(1)
+                    escaped = name_value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+                    if escaped != name_value:
+                        nonlocal changes_made
+                        changes_made = True
+                    return f'name="{escaped}"'
+
+                line = re.sub(r'name="([^"]*)"', escape_name_attr, line)
+            
+            fixed_lines.append(line)
+        
+        new_content = '\n'.join(fixed_lines)
+        
+        if new_content != original_content:
+            print(f"  [!] Fixed XML escaping issues in {os.path.basename(file_path)}")
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(new_content)
             return True
         return False
     except Exception as e:
         print(f"  [!] Error fixing XML: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def process_image_for_3ds(file_path, root, name):
@@ -137,7 +156,7 @@ def main():
             continue
 
         print(f"  [2/3] Parsing XML and generating CEA...")
- 
+        
         fix_xml_escapes(xml_path)
         
         try:
@@ -192,10 +211,12 @@ def main():
             continue
         except Exception as e:
             print(f"      FAILED: {e}")
+            import traceback
+            traceback.print_exc()
             if png_to_convert != png_path and os.path.exists(png_to_convert):
                 os.remove(png_to_convert)
             continue
-
+            
         print(f"  [3/3] Cleaning up...")
         try:
             os.remove(png_path)
