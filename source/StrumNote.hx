@@ -41,11 +41,11 @@ class StrumNote extends CitroAnimate
 		var lastAnim:String = this.curAnim;
 
 		if(PlayState.isPixelStage) {
-			this.reloadCEA(Paths.cea('pixelUI/' + texture), lastAnim != null ? lastAnim : "static");
-			this.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
+		    this.reloadCEA(Paths.cea('pixelUI/' + texture), lastAnim != null ? lastAnim : "static");
+		    this.scale.set(PlayState.daPixelZoom, PlayState.daPixelZoom);
 		} else {
-			this.reloadCEA(Paths.cea(texture), lastAnim != null ? lastAnim : "static");
-			this.scale.set(0.7, 0.7);
+		    this.reloadCEA(Paths.cea(texture), lastAnim != null ? lastAnim : "static");
+		    this.scale.set(0.35, 0.35);
 		}
 		if(lastAnim != null) {
 			this.play(lastAnim);
