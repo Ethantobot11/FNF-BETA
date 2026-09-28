@@ -176,17 +176,31 @@ class Paths {
 
 	public static function returnGraphicPath(key:String, ?library:String):String {
 		#if MODS_ALLOWED
-		var modKey:String = modsImages(key);
-		if(FileSystem.exists(modKey)) {
-			localTrackedAssets.push(modKey);
-			return modKey;
+		var modKeyT3x:String = modFolders('images/' + key + '.t3x');
+		if(FileSystem.exists(modKeyT3x)) {
+			localTrackedAssets.push(modKeyT3x);
+			return modKeyT3x;
+		}
+		
+		var modKeyPng:String = modFolders('images/' + key + '.png');
+		if(FileSystem.exists(modKeyPng)) {
+			localTrackedAssets.push(modKeyPng);
+			return modKeyPng;
 		}
 		#end
-		var path = getPath('images/$key.png', "IMAGE", library);
-		if (FileSystem.exists(path)) {
-			localTrackedAssets.push(path);
-			return path;
+		
+		var pathT3x = getPath('images/$key.t3x', "IMAGE", library);
+		if (FileSystem.exists(pathT3x)) {
+			localTrackedAssets.push(pathT3x);
+			return pathT3x;
 		}
+
+		var pathPng = getPath('images/$key.png', "IMAGE", library);
+		if (FileSystem.exists(pathPng)) {
+			localTrackedAssets.push(pathPng);
+			return pathPng;
+		}
+		
 		trace('oh no its returning null NOOOO for image: $key');
 		return null;
 	}
