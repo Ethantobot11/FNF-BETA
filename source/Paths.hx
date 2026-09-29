@@ -108,7 +108,7 @@ class Paths {
 		return returnGraphicPath(key, library);
 	}
 
-	inline static public function cea(key:String, ?library:String):String {
+	static public function cea(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/$key.cea');
 		return ceaPath;
@@ -116,7 +116,7 @@ class Paths {
 		return getPath('images/$key.cea', "TEXT", library);
 	}
 
-	inline static public function animateAtlas(key:String, ?library:String):String {
+	static public function animateAtlas(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/' + key + '/Animation.cea');
 		return ceaPath;
