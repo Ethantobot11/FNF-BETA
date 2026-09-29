@@ -275,29 +275,23 @@ def main():
                 continue
 
             if ext == ".png":
-                t3x_path = os.path.join(root, name + ".t3x")
-                if os.path.exists(t3x_path):
                     try:
                         os.remove(file_path)
-                        print(f"  Removed: {file} (t3x exists)")
+                        print(f"  Removed: {file}")
                     except Exception as e:
                         print(f"  Warning: Could not remove {file}: {e}")
             
             elif ext == ".xml":
-                cea_path = os.path.join(root, name + ".cea")
-                if os.path.exists(cea_path):
                     try:
                         os.remove(file_path)
-                        print(f"  Removed: {file} (cea exists)")
+                        print(f"  Removed: {file}")
                     except Exception as e:
                         print(f"  Warning: Could not remove {file}: {e}")
 
             elif ext in [".mp3", ".wav", ".ogg"]:
-                cwav_path = os.path.join(root, name + ".cwav")
-                if os.path.exists(cwav_path):
                     try:
                         os.remove(file_path)
-                        print(f"  Removed: {file} (cwav exists)")
+                        print(f"  Removed: {file}")
                     except Exception as e:
                         print(f"  Warning: Could not remove {file}: {e}")
     
