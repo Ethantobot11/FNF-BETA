@@ -43,10 +43,10 @@ class Paths {
 			var levelPath:String = '';
 			if(currentLevel != 'shared') {
 				levelPath = getLibraryPathForce(file, currentLevel);
-				if (FileSystem.exists(levelPath)) return levelPath;
+				return levelPath;
 			}
 			levelPath = getLibraryPathForce(file, "shared");
-			if (FileSystem.exists(levelPath)) return levelPath;
+			return levelPath;
 		}
 		return getPreloadPath(file);
 	}
@@ -77,7 +77,7 @@ class Paths {
 	static public function video(key:String):String {
 		#if MODS_ALLOWED
 		var file:String = modsVideo(key);
-		if(FileSystem.exists(file)) return file;
+		return file;
 		#end
 		return 'romfs:/assets/videos/$key.$VIDEO_EXT';
 	}
@@ -111,7 +111,7 @@ class Paths {
 	inline static public function cea(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/$key.cea');
-		if(FileSystem.exists(ceaPath)) return ceaPath;
+		return ceaPath;
 		#end
 		return getPath('images/$key.cea', "TEXT", library);
 	}
@@ -119,7 +119,7 @@ class Paths {
 	inline static public function animateAtlas(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/' + key + '/Animation.cea');
-		if(FileSystem.exists(ceaPath)) return ceaPath;
+		return ceaPath;
 		#end
 		return getPath('images/' + key + '/Animation.cea', "TEXT", library);
 	}
@@ -127,22 +127,29 @@ class Paths {
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String {
 		#if sys
 		#if MODS_ALLOWED
-		if (!ignoreMods && FileSystem.exists(modFolders(key)))
-			return File.getContent(modFolders(key));
+		if (!ignoreMods) {
+			try {
+				return File.getContent(modFolders(key));
+			} catch(e:Dynamic) {}
+		}
 		#end
 
-		var fullPath = getPreloadPath(key);
-		if (FileSystem.exists(fullPath))
-			return File.getContent(fullPath);
+		try {
+			return File.getContent(getPreloadPath(key));
+		} catch(e:Dynamic) {}
 
 		if (currentLevel != null) {
 			var levelPath:String = '';
 			if(currentLevel != 'shared') {
 				levelPath = getLibraryPathForce(key, currentLevel);
-				if (FileSystem.exists(levelPath)) return File.getContent(levelPath);
+				try {
+					return File.getContent(levelPath);
+				} catch(e:Dynamic) {}
 			}
 			levelPath = getLibraryPathForce(key, 'shared');
-			if (FileSystem.exists(levelPath)) return File.getContent(levelPath);
+			try {
+				return File.getContent(levelPath);
+			} catch(e:Dynamic) {}
 		}
 		#end
 		
@@ -153,18 +160,13 @@ class Paths {
 	inline static public function font(key:String):String {
 		#if MODS_ALLOWED
 		var file:String = modsFont(key);
-		if(FileSystem.exists(file)) return file;
+		return file;
 		#end
 		return 'romfs:/assets/fonts/$key';
 	}
 
 	inline static public function fileExists(key:String, type:String, ?ignoreMods:Bool = false, ?library:String):Bool {
-		#if MODS_ALLOWED
-		if(FileSystem.exists(mods(currentModDirectory + '/' + key)) || FileSystem.exists(mods(key))) {
-			return true;
-		}
-		#end
-		return FileSystem.exists(getPath(key, type));
+		return true;
 	}
 
 	inline static public function formatToSongPath(path:String):String {
@@ -177,31 +179,18 @@ class Paths {
 	public static function returnGraphicPath(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var modKey:String = modsImages(key);
-		if(FileSystem.exists(modKey)) {
-			localTrackedAssets.push(modKey);
-			return modKey;
-		}
+		return modKey;
 		#end
-		var path = getPath('images/$key.png', "IMAGE", library);
-		if (FileSystem.exists(path)) {
-			localTrackedAssets.push(path);
-			return path;
-		}
-		trace('oh no its returning null NOOOO for image: $key');
-		return null;
+		
+		return getPath('images/$key.t3x', "IMAGE", library);
 	}
 
 	public static function returnSoundPath(path:String, key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var file:String = modsSounds(path, key);
-		if(FileSystem.exists(file)) {
-			localTrackedAssets.push(file);
-			return file;
-		}
+		return file;
 		#end
-		var gottenPath:String = getPath('$path/$key.$SOUND_EXT', "SOUND", library);
-		localTrackedAssets.push(gottenPath);
-		return gottenPath;
+		return getPath('$path/$key.$SOUND_EXT', "SOUND", library);
 	}
 
 	#if MODS_ALLOWED
@@ -210,16 +199,14 @@ class Paths {
 	inline static public function modsJson(key:String):String return modFolders('data/' + key + '.json');
 	inline static public function modsVideo(key:String):String return modFolders('videos/' + key + '.' + VIDEO_EXT);
 	inline static public function modsSounds(path:String, key:String):String return modFolders(path + '/' + key + '.' + SOUND_EXT);
-	inline static public function modsImages(key:String):String return modFolders('images/' + key + '.png');
+	inline static public function modsImages(key:String):String return modFolders('images/' + key + '.t3x');
 
 	static public function modFolders(key:String):String {
 		if(currentModDirectory != null && currentModDirectory.length > 0) {
-			var fileToCheck:String = mods(currentModDirectory + '/' + key);
-			if(FileSystem.exists(fileToCheck)) return fileToCheck;
+			return mods(currentModDirectory + '/' + key);
 		}
 		for(mod in getGlobalMods()){
-			var fileToCheck:String = mods(mod + '/' + key);
-			if(FileSystem.exists(fileToCheck)) return fileToCheck;
+			return mods(mod + '/' + key);
 		}
 		return 'sdmc:/FNF-PE/mods/' + key;
 	}
@@ -230,40 +217,38 @@ class Paths {
 	static public function pushGlobalMods():Array<String> {
 		globalMods = [];
 		var path:String = 'sdmc:/FNF-PE/modsList.txt';
-		if(FileSystem.exists(path)) {
+		try {
 			var list:Array<String> = CoolUtil.coolTextFile(path);
 			for (i in list) {
 				var dat = i.split("|");
 				if (dat[1] == "1") {
 					var folder = dat[0];
 					var mPath = Paths.mods(folder + '/pack.json');
-					if(FileSystem.exists(mPath)) {
-						try {
-							var rawJson:String = File.getContent(mPath);
-							if(rawJson != null && rawJson.length > 0) {
-								var stuff:Dynamic = Json.parse(rawJson);
-								var global:Bool = Reflect.getProperty(stuff, "runsGlobally");
-								if(global) globalMods.push(dat[0]);
-							}
-						} catch(e:Dynamic) { trace(e); }
-					}
+					try {
+						var rawJson:String = File.getContent(mPath);
+						if(rawJson != null && rawJson.length > 0) {
+							var stuff:Dynamic = Json.parse(rawJson);
+							var global:Bool = Reflect.getProperty(stuff, "runsGlobally");
+							if(global) globalMods.push(dat[0]);
+						}
+					} catch(e:Dynamic) { trace(e); }
 				}
 			}
-		}
+		} catch(e:Dynamic) {}
 		return globalMods;
 	}
 
 	static public function getModDirectories():Array<String> {
 		var list:Array<String> = [];
 		var modsFolder:String = mods();
-		if(FileSystem.exists(modsFolder)) {
+		try {
 			for (folder in FileSystem.readDirectory(modsFolder)) {
 				var path = haxe.io.Path.join([modsFolder, folder]);
 				if (FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder) && !list.contains(folder)) {
 					list.push(folder);
 				}
 			}
-		}
+		} catch(e:Dynamic) {}
 		return list;
 	}
 	#end

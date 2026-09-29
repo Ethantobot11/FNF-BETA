@@ -150,7 +150,6 @@ class TitleState extends MusicBeatState
 	{
 		if (!initialized) {
 			SoundPlayer.preload(Paths.music('freakyMenu'));
-			SoundPlayer.playSound(Paths.music('freakyMenu'));
 		}
 
 		Conductor.changeBPM(titleJSON.bpm);
