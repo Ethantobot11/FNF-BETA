@@ -3,14 +3,15 @@ import subprocess
 import shutil
 import xml.etree.ElementTree as ET
 import math
-import json
+import html
+import re
 
 try:
     from PIL import Image
     HAS_PILLOW = True
 except ImportError:
     HAS_PILLOW = False
-    print("WARNING: Pillow not found. Install it via 'pip install Pillow' to fix texture dimension errors.")
+    print("\nWARNING: Pillow not found. Install via 'pip install Pillow'\n")
 
 def get_tool_path(tool_name: str) -> str:
     tool_path = shutil.which(tool_name)
@@ -24,93 +25,86 @@ def get_tool_path(tool_name: str) -> str:
 def next_power_of_2(n: int) -> int:
     return 1 if n == 0 else 2**(math.ceil(math.log2(n)))
 
-def convert_animate_atlas(root, files, tex3ds_path):
-    """Converts AnimateAtlas (Texture Atlas) folders to .cea + .t3x"""
-    if "Animation.json" in files and "spritemap.json" in files and "spritemap.png" in files:
-        anim_json = os.path.join(root, "Animation.json")
-        sprite_json = os.path.join(root, "spritemap.json")
-        png_path = os.path.join(root, "spritemap.png")
-        t3x_path = os.path.join(root, "spritemap.t3x")
-        cea_path = os.path.join(root, "Animation.cea")
+MAX_3DS_SAFE_SIZE = 1024
 
-        print(f"  [AnimateAtlas] Converting {root}...")
+excluded_files = {
+    os.path.normpath("assets/resources/audio.wav"),
+    os.path.normpath("assets/resources/banner.png"),
+    os.path.normpath("assets/resources/icon.png")
+}
 
-        png_to_convert = png_path
-        if HAS_PILLOW:
-            try:
-                img = Image.open(png_path)
-                width, height = img.size
-                new_width = next_power_of_2(width)
-                new_height = next_power_of_2(height)
-                if new_width != width or new_height != height:
-                    print(f"    [!] Padding {png_path} to {new_width}x{new_height}")
-                    new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
-                    new_img.paste(img, (0, 0))
-                    png_to_convert = os.path.join(root, "spritemap_padded.png")
-                    new_img.save(png_to_convert)
-            except Exception as e:
-                print(f"    WARNING: Could not pad image: {e}")
-
-        try:
-            subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], 
-                          check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception as e:
-            print(f"    ERROR: tex3ds failed on {png_to_convert}. ({e})")
-            if png_to_convert != png_path and os.path.exists(png_to_convert):
-                os.remove(png_to_convert)
-            return
-
-        try:
-            with open(sprite_json, 'r', encoding='utf-8') as f:
-                atlas_data = json.load(f)
-            with open(anim_json, 'r', encoding='utf-8-sig') as f: 
-                anim_data = json.load(f)
-        except Exception as e:
-            print(f"    ERROR: Failed to parse AnimateAtlas JSONs. ({e})")
-            if png_to_convert != png_path and os.path.exists(png_to_convert):
-                os.remove(png_to_convert)
-            return
-
-        sprite_coords = {}
-        if "ATLAS" in atlas_data and "SPRITES" in atlas_data["ATLAS"]:
-            for s in atlas_data["ATLAS"]["SPRITES"]:
-                spr = s["SPRITE"]
-                sprite_coords[spr["name"]] = spr
-
-        cea_lines = []
+def fix_xml_escapes(file_path):
+    """Fix all XML escaping issues in Adobe Animate exports"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
         
-        if "SYMBOL_DICTIONARY" in anim_data and "Symbols" in anim_data["SYMBOL_DICTIONARY"]:
-            for symbol in anim_data["SYMBOL_DICTIONARY"]["Symbols"]:
-                sym_name = symbol.get("SYMBOL_name", "unknown")
-                
-                if "TIMELINE" in symbol and "LAYERS" in symbol["TIMELINE"]:
-                    for layer in symbol["TIMELINE"]["LAYERS"]:
-                        for frame in layer.get("Frames", []):
-                            frame_name = frame.get("name", sym_name)
-                            
-                            sprite_name = None
-                            if "elements" in frame and len(frame["elements"]) > 0:
-                                elem = frame["elements"][0]
-                                if "ATLAS_SPRITE_instance" in elem:
-                                    sprite_name = elem["ATLAS_SPRITE_instance"].get("name")
-                            
-                            if sprite_name and sprite_name in sprite_coords:
-                                coord = sprite_coords[sprite_name]
-                                cea_line = f"spritemap.t3x?{coord['x']}?{coord['y']}?{coord['w']}?{coord['h']}?0?0?{coord['w']}?{coord['h']}?{frame_name}"
-                                cea_lines.append(cea_line)
+        original_content = content
+        lines = content.split('\n')
+        fixed_lines = []
+        changes_made = False
+        
+        for line in lines:
+            if '<SubTexture' in line:
+                def escape_name_attr(match):
+                    nonlocal changes_made
+                    name_value = match.group(1)
+                    escaped = name_value.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+                    if escaped != name_value:
+                        changes_made = True
+                    return f'name="{escaped}"'
 
-        if cea_lines:
-            with open(cea_path, 'w', encoding='utf-8') as f:
-                f.write("\n".join(cea_lines) + "\n")
-            print(f"    SUCCESS: Generated Animation.cea and spritemap.t3x")
+                line = re.sub(r'name="([^"]*)"', escape_name_attr, line)
             
-            os.remove(anim_json)
-            os.remove(sprite_json)
-            os.remove(png_path)
-            if png_to_convert != png_path and os.path.exists(png_to_convert):
-                os.remove(png_to_convert)
-        else:
-            print(f"    WARNING: No valid frames found in {root}")
+            fixed_lines.append(line)
+        
+        new_content = '\n'.join(fixed_lines)
+        
+        if new_content != original_content:
+            print(f"  [!] Fixed XML escaping issues in {os.path.basename(file_path)}")
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            return True
+        return False
+    except Exception as e:
+        print(f"  [!] Error fixing XML: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def process_image_for_3ds(file_path, root, name):
+    if not HAS_PILLOW:
+        return file_path
+    try:
+        img = Image.open(file_path)
+        if img.mode != 'RGBA':
+            print(f"  [!] Converting {name} color profile to standard RGBA")
+            img = img.convert('RGBA')
+        width, height = img.size
+        if width > MAX_3DS_SAFE_SIZE or height > MAX_3DS_SAFE_SIZE:
+            print(f"  [!] Resizing {name} from {width}x{height} to fit 3DS safe limit")
+            scale = MAX_3DS_SAFE_SIZE / max(width, height)
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
+            width, height = new_width, new_height
+        p2_width = next_power_of_2(width)
+        p2_height = next_power_of_2(height)
+        if p2_width != width or p2_height != height:
+            print(f"  [!] Padding {name} to {p2_width}x{p2_height}")
+            new_img = Image.new("RGBA", (p2_width, p2_height), (0, 0, 0, 0))
+            new_img.paste(img, (0, 0))
+            out_path = os.path.join(root, name + "_processed.png")
+            new_img.save(out_path)
+            return out_path
+        if img.mode == 'RGBA' and img.filename != file_path:
+            out_path = os.path.join(root, name + "_rgba.png")
+            img.save(out_path)
+            return out_path
+        return file_path
+    except Exception as e:
+        print(f"  [!] ERROR processing image {name}: {e}")
+        return file_path
 
 def main():
     os.makedirs("assets/romfs/haxe3ds", exist_ok=True)
@@ -118,97 +112,77 @@ def main():
         f.write("")
 
     if not os.path.exists("assets"):
-        print("No 'assets' directory found. Skipping conversion.")
+        print("No 'assets' directory found.")
         return
-
-    excluded_files = {
-        os.path.normpath("assets/resources/audio.wav"),
-        os.path.normpath("assets/romfs/resources/audio.wav"),
-        os.path.normpath("resources/audio.wav"),
-        os.path.normpath("audio.wav")
-    }
-    looped_files = { os.path.normpath("assets/sounds/home.ogg") }
 
     tex3ds_path = get_tool_path("tex3ds")
     cwavtool_path = get_tool_path("cwavtool")
+    looped_files = { os.path.normpath("assets/sounds/home.ogg") }
     
     print(f"Using tex3ds at: {tex3ds_path}")
-    print(f"Using cwavtool at: {cwavtool_path}")
+    print(f"Using cwavtool at: {cwavtool_path}\n")
 
     sprite_sheets = []
-    other_files = []
 
     for root, dirs, files in os.walk("assets"):
-        convert_animate_atlas(root, files, tex3ds_path)
-
         for file in files:
             file_path = os.path.join(root, file)
             name, ext = os.path.splitext(file)
-            ext = ext.lower()
-            
-            if ext == ".xml":
+            if ext.lower() == ".xml":
+                if os.path.normpath(file_path) in excluded_files:
+                    continue
                 png_path = os.path.join(root, name + ".png")
                 if os.path.exists(png_path):
                     sprite_sheets.append((root, name, file_path, png_path))
-                else:
-                    print(f"Warning: Found {file_path} but no corresponding {name}.png")
-            else:
-                other_files.append((root, name, ext, file_path))
+
+    print(f"Found {len(sprite_sheets)} sprite sheets to convert\n")
 
     for root, name, xml_path, png_path in sprite_sheets:
         t3x_name = name + ".t3x"
         t3x_path = os.path.join(root, t3x_name)
         cea_path = os.path.join(root, name + ".cea")
         
-        print(f"\nProcessing sprite sheet: {name}")
+        print(f"Processing: {name}")
         
-        png_to_convert = png_path
-        if HAS_PILLOW:
-            try:
-                img = Image.open(png_path)
-                width, height = img.size
-                new_width = next_power_of_2(width)
-                new_height = next_power_of_2(height)
-                
-                if new_width != width or new_height != height:
-                    print(f"  [!] Padding {name} from {width}x{height} to {new_width}x{new_height} (3DS requires Power of 2)")
-                    new_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
-                    new_img.paste(img, (0, 0))
-                    png_to_convert = os.path.join(root, name + "_padded.png")
-                    new_img.save(png_to_convert)
-            except Exception as e:
-                print(f"  WARNING: Could not check/Pad image with Pillow: {e}")
-
-        print(f"  [1/3] Converting to {t3x_path} using tex3ds...")
+        png_to_convert = process_image_for_3ds(png_path, root, name)
+        
+        print(f"  [1/3] Converting PNG to T3X...")
         try:
-            subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], check=True, env=os.environ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception as e:
-            print(f"  ERROR: tex3ds failed on {png_to_convert}. Skipping. ({e})")
+            subprocess.run([tex3ds_path, png_to_convert, "-o", t3x_path, "-f", "rgba8"], 
+                          check=True, env=os.environ, capture_output=True, text=True)
+            print(f"      SUCCESS: Created {t3x_name}")
+        except subprocess.CalledProcessError as e:
+            print(f"      FAILED: tex3ds error")
             if png_to_convert != png_path and os.path.exists(png_to_convert):
                 os.remove(png_to_convert)
             continue
 
-        print(f"  [2/3] Generating 10-column {cea_path} from {xml_path}...")
+        print(f"  [2/3] Parsing XML and generating CEA...")
+        
+        fix_xml_escapes(xml_path)
+        
         try:
             tree = ET.parse(xml_path)
             root_elem = tree.getroot()
-            cea_lines = []
             
-            for subtex in root_elem.findall(".//SubTexture"):
+            subtextures = root_elem.findall(".//SubTexture")
+            print(f"      Found {len(subtextures)} SubTexture elements")
+            
+            cea_lines = []
+            for i, subtex in enumerate(subtextures):
                 frame_name = subtex.get("name")
+                if not frame_name: 
+                    continue
+                
                 x = subtex.get("x", "0")
                 y = subtex.get("y", "0")
                 width = subtex.get("width", "0")
                 height = subtex.get("height", "0")
-                
                 frameX = subtex.get("frameX", "0")
                 frameY = subtex.get("frameY", "0")
                 frameWidth = subtex.get("frameWidth", width)
                 frameHeight = subtex.get("frameHeight", height)
                 
-                if not frame_name:
-                    continue
-                    
                 if "_" in frame_name and frame_name.split("_")[-1].isdigit():
                     parts = frame_name.rsplit("_", 1)
                     anim_name = parts[0]
@@ -218,70 +192,116 @@ def main():
                     cea_line = f"{t3x_name}?{x}?{y}?{width}?{height}?{frameX}?{frameY}?{frameWidth}?{frameHeight}?{name}-{int(frame_name)}"
                 else:
                     cea_line = f"{t3x_name}?{x}?{y}?{width}?{height}?{frameX}?{frameY}?{frameWidth}?{frameHeight}?{frame_name}"
-                    
+                
                 cea_lines.append(cea_line)
             
-            with open(cea_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(cea_lines) + "\n")
+            print(f"      Generated {len(cea_lines)} CEA lines")
+            
+            if cea_lines:
+                with open(cea_path, "w", encoding="utf-8") as f:
+                    f.write("\n".join(cea_lines) + "\n")
+                print(f"      SUCCESS: Created {name}.cea")
+            else:
+                print(f"      WARNING: No CEA lines generated!")
                 
-        except Exception as e:
-            print(f"  ERROR: Failed to parse XML {xml_path}: {e}")
+        except ET.ParseError as e:
+            print(f"      FAILED: XML parsing error at line {e.lineno}, column {e.offset}")
+            print(f"      Error: {e.msg}")
+            print(f"      Skipping CEA generation for {name}")
             if png_to_convert != png_path and os.path.exists(png_to_convert):
                 os.remove(png_to_convert)
             continue
-
-        print(f"  [3/3] Cleaning up original files...")
+        except Exception as e:
+            print(f"      FAILED: {e}")
+            import traceback
+            traceback.print_exc()
+            if png_to_convert != png_path and os.path.exists(png_to_convert):
+                os.remove(png_to_convert)
+            continue
+            
+        print(f"  [3/3] Cleaning up...")
         try:
             os.remove(png_path)
             os.remove(xml_path)
             if png_to_convert != png_path and os.path.exists(png_to_convert):
                 os.remove(png_to_convert)
-            print(f"  SUCCESS: {name} converted to CEA and cleaned up.")
+            print(f"      Deleted original files")
         except Exception as e:
-            print(f"  WARNING: Could not delete original files for {name}: {e}")
-
-    for root, name, ext, file_path in other_files:
-        if not os.path.exists(file_path): continue
+            print(f"      WARNING: Could not delete files: {e}")
         
-        if ext == ".mp3" and os.path.normpath(file_path) not in excluded_files:
-            out_path = os.path.join(root, name + ".ogg")
-            try:
+        print(f"  DONE: {name}\n")
+
+    for root, dirs, files in os.walk("assets"):
+        for file in files:
+            file_path = os.path.join(root, file)
+            name, ext = os.path.splitext(file)
+            ext = ext.lower()
+            
+            if os.path.normpath(file_path) in excluded_files:
+                continue
+            
+            if ext == ".mp3":
                 print(f"Converting {name}.mp3 to .ogg...")
-                subprocess.run(["ffmpeg", "-y", "-i", file_path, "-q:a", "4", out_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                os.remove(file_path)
-            except Exception as e: 
-                print(f"Error converting {file_path} to OGG: {e}")
-                
-        elif ext in [".wav", ".ogg"] and os.path.normpath(file_path) not in excluded_files:
-            out_path = os.path.join(root, name + ".cwav")
-            try:
-                is_music = "music" in root.lower() or "song" in root.lower() or "voices" in root.lower() or "inst" in root.lower()
-                channels = 2 if is_music else 1
-                
-                temp_wav = os.path.join(root, name + "_temp.wav")
-                print(f"  Normalizing {name}{ext} to {channels}ch, 32kHz WAV for 3DS...")
-                
-                subprocess.run([
-                    "ffmpeg", "-y", "-i", file_path, 
-                    "-ar", "32000", "-ac", str(channels), "-c:a", "pcm_s16le", 
-                    temp_wav
-                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                
-                print(f"  Converting to CWAV...")
-                cmd = [cwavtool_path, "-i", temp_wav, "-o", out_path]
-                if os.path.normpath(file_path) in looped_files: 
-                    cmd.extend(["-ls", "0", "-le", "end"])
-                subprocess.run(cmd, check=True, env=os.environ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                
-                os.remove(temp_wav)
-                if ext == ".wav": 
+                try:
+                    subprocess.run(["ffmpeg", "-y", "-i", file_path, "-q:a", "4", os.path.join(root, name + ".ogg")], 
+                                  check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     os.remove(file_path)
-                print(f"  SUCCESS: {name} converted to CWAV.")
-                
-            except Exception as e: 
-                print(f"  ERROR converting {file_path} to CWAV: {e}")
-                if os.path.exists(temp_wav):
+                except: pass
+            elif ext in [".wav", ".ogg"]:
+                print(f"Converting {name}{ext} to .cwav...")
+                try:
+                    is_music = "music" in root.lower() or "song" in root.lower()
+                    channels = 2 if is_music else 1
+                    temp_wav = os.path.join(root, name + "_temp.wav")
+                    subprocess.run(["ffmpeg", "-y", "-i", file_path, "-ar", "32000", "-ac", str(channels), "-c:a", "pcm_s16le", temp_wav], 
+                                  check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    cmd = [cwavtool_path, "-i", temp_wav, "-o", os.path.join(root, name + ".cwav")]
+                    if os.path.normpath(file_path) in looped_files: cmd.extend(["-ls", "0", "-le", "end"])
+                    subprocess.run(cmd, check=True, env=os.environ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     os.remove(temp_wav)
+                    os.remove(file_path)
+                except Exception as e: 
+                    print(f"  Error: {e}")
+                    if os.path.exists(temp_wav): os.remove(temp_wav)
+
+    print("\n=== Final Cleanup Pass ===")
+    for root, dirs, files in os.walk("assets"):
+        for file in files:
+            file_path = os.path.join(root, file)
+            name, ext = os.path.splitext(file)
+            ext = ext.lower()
+            
+            if os.path.normpath(file_path) in excluded_files:
+                continue
+
+            if ext == ".png":
+                t3x_path = os.path.join(root, name + ".t3x")
+                if os.path.exists(t3x_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"  Removed: {file} (t3x exists)")
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {file}: {e}")
+            
+            elif ext == ".xml":
+                cea_path = os.path.join(root, name + ".cea")
+                if os.path.exists(cea_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"  Removed: {file} (cea exists)")
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {file}: {e}")
+
+            elif ext in [".mp3", ".wav", ".ogg"]:
+                cwav_path = os.path.join(root, name + ".cwav")
+                if os.path.exists(cwav_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"  Removed: {file} (cwav exists)")
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {file}: {e}")
+    
+    print("\n=== Conversion Complete ===")
 
 if __name__ == "__main__":
     main()

@@ -20,9 +20,10 @@ import haxe.Json;
 import sys.FileSystem;
 import sys.io.File;
 
-//import options.GraphicsSettingsSubState;
+// import options.GraphicsSettingsSubState;
 
 using StringTools;
+
 @:headerInclude("3ds.h")
 typedef TitleData = {
 	titlex:Float,
@@ -70,12 +71,10 @@ class TitleState extends MusicBeatState
 		#end
 		
 		WeekData.loadTheFirstEnabledMod();
-
 		PlayerSettings.init();
 
-		// curWacky = CoolUtil.getRandomObject(getIntroTextShit()); // Adapt to your util
+		curWacky = CoolUtil.getRandomObject(getIntroTextShit());
 
-		//swagShader = new ColorSwap(); // Keep your custom shader class
 		super.create();
 
 		CitroG.save.data('funkin', 'ninjamuffin99');
@@ -96,15 +95,44 @@ class TitleState extends MusicBeatState
 
 		Highscore.load();
 
-		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'));
+		try {
+		    var jsonContent:String = Paths.getTextFromFile('images/gfDanceTitle.json');
+		    var parsedJSON:TitleData = Json.parse(jsonContent);
+		    
+		    var scaleX = 400 / 1280;
+		    var scaleY = 240 / 720;
+		    
+		    titleJSON = {
+		        titlex: parsedJSON.titlex * scaleX,
+		        titley: parsedJSON.titley * scaleY,
+		        startx: parsedJSON.startx * scaleX,
+		        starty: parsedJSON.starty * scaleY,
+		        gfx: parsedJSON.gfx * scaleX,
+		        gfy: parsedJSON.gfy * scaleY,
+		        backgroundSprite: parsedJSON.backgroundSprite,
+		        bpm: parsedJSON.bpm
+		    };
+		} catch(e:Dynamic) {
+		    titleJSON = {
+		        titlex: 200,
+		        titley: 30,
+		        startx: 200,
+		        starty: 190,
+		        gfx: 220,
+		        gfy: 130,
+		        backgroundSprite: "",
+		        bpm: 102
+		    };
+		    trace("Using 3DS fallback title coordinates");
+		}
 
 		#if TITLE_SCREEN_EASTER_EGG
 		if (CitroG.save.data.psychDevsEasterEgg == null) CitroG.save.data.psychDevsEasterEgg = '';
 		switch(CitroG.save.data.psychDevsEasterEgg.toUpperCase()) {
-			case 'SHADOW': titleJSON.gfx += 210; titleJSON.gfy += 40;
-			case 'RIVER': titleJSON.gfx += 100; titleJSON.gfy += 20;
-			case 'SHUBS': titleJSON.gfx += 160; titleJSON.gfy -= 10;
-			case 'BBPANZU': titleJSON.gfx += 45; titleJSON.gfy += 100;
+			case 'SHADOW': titleJSON.gfx += 60; titleJSON.gfy += 15;
+			case 'RIVER': titleJSON.gfx += 30; titleJSON.gfy += 10;
+			case 'SHUBS': titleJSON.gfx += 50; titleJSON.gfy -= 5;
+			case 'BBPANZU': titleJSON.gfx += 15; titleJSON.gfy += 30;
 		}
 		#end
 
@@ -144,7 +172,6 @@ class TitleState extends MusicBeatState
 	var gfDance:CitroAnimate;
 	var danceLeft:Bool = false;
 	var titleText:CitroAnimate;
-	//var swagShader:ColorSwap = null;
 
 	function startIntro()
 	{
@@ -162,10 +189,12 @@ class TitleState extends MusicBeatState
         gfDance = new CitroAnimate(Paths.cea('gfDanceTitle'));
         gfDance.x = titleJSON.gfx;
         gfDance.y = titleJSON.gfy;
+        gfDance.scale.set(0.35, 0.35);
 
         logoBl = new CitroAnimate(Paths.cea('logoBumpin'));
         logoBl.x = titleJSON.titlex;
         logoBl.y = titleJSON.titley;
+        logoBl.scale.set(0.35, 0.35);
 
 		var easterEgg:String = CitroG.save.data.psychDevsEasterEgg;
 		if(easterEgg == null) easterEgg = '';
@@ -186,18 +215,21 @@ class TitleState extends MusicBeatState
 		titleText = new CitroAnimate(Paths.cea('titleEnter'));
         titleText.x = titleJSON.startx;
         titleText.y = titleJSON.starty;
+		titleText.scale.set(0.4, 0.4);
 		titleText.play('idle');
 		CitroG.state.members.push(titleText);
 
 		var logo:CitroSprite = new CitroSprite();
         logo.loadGraphic(Paths.image('logo'));
-		logo.screenCenter(XY);
+		logo.scale.set(0.4, 0.4);
+		logo.x = (400 - logo.width) / 2;
+		logo.y = (240 - logo.height) / 2;
 		CitroG.state.members.push(logo);
 
 		credGroup = [];
 		textGroup = [];
 
-		blackScreen = new CitroSprite().makeGraphic(CitroG.WIDTH, CitroG.HEIGHT, CitroColor.BLACK);
+		blackScreen = new CitroSprite().makeGraphic(400, 240, CitroColor.BLACK);
 		credGroup.push(blackScreen);
 		CitroG.state.members.push(blackScreen);
 
@@ -205,12 +237,12 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter(XY);
 		credTextShit.visible = false;
 
-		ngSpr = new CitroSprite(0, CitroG.HEIGHT * 0.52);
+		ngSpr = new CitroSprite(0, 130);
         ngSpr.loadGraphic(Paths.image('newgrounds_logo'));
 		CitroG.state.members.push(ngSpr);
 		ngSpr.visible = false;
-		ngSpr.scale.set(0.8, 0.8);
-		ngSpr.screenCenter(X);
+		ngSpr.scale.set(0.4, 0.4);
+		ngSpr.x = (400 - ngSpr.width) / 2;
 
 		var tweenProps = new Map<String, Float>();
 		tweenProps.set("y", credTextShit.y + 20);
@@ -224,22 +256,28 @@ class TitleState extends MusicBeatState
 	}
 
 	function getIntroTextShit():Array<Array<String>> {
-		var fullText:String = File.getContent(Paths.txt('introText'));
-		var firstArray:Array<String> = fullText.split('\n');
-		var swagGoodArray:Array<Array<String>> = [];
-		for (i in firstArray) swagGoodArray.push(i.split('--'));
-		return swagGoodArray;
+		try {
+			var fullText:String = File.getContent(Paths.txt('introText'));
+			var firstArray:Array<String> = fullText.split('\n');
+			var swagGoodArray:Array<Array<String>> = [];
+			for (i in firstArray) swagGoodArray.push(i.split('--'));
+			return swagGoodArray;
+		} catch(e:Dynamic) {
+			return [["Friday Night Funkin'", "3DS Port"]];
+		}
 	}
 
 	var transitioning:Bool = false;
 	private static var playJingle:Bool = false;
 	var newTitle:Bool = false;
 	var titleTimer:Float = 0;
+	var skippedIntro:Bool = false;
+	public static var closedState:Bool = false;
+	private var sickBeats:Int = 0;
 
 	override function update(delta:Int):Void
 	{
 		var elapsed:Float = delta / 1000.0;
-
 		Conductor.songPosition += elapsed * 1000;
 
 		var pressedEnter:Bool = controls.ACCEPT; 
@@ -255,7 +293,7 @@ class TitleState extends MusicBeatState
 				if (timer >= 1) timer = (-timer) + 2;
 				timer = timer < 0.5 ? 2 * timer * timer : 1 - Math.pow(-2 * timer + 2, 2) / 2;
 				
-				titleText.color = interpolateColor(titleTextColors[0], titleTextColors[1], timer);
+				// titleText.color = interpolateColor(titleTextColors[0], titleTextColors[1], timer);
 				titleText.alpha = CitroMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
 			}
 			
@@ -294,7 +332,7 @@ class TitleState extends MusicBeatState
 		for (i in 0...textArray.length) {
 			var money:Alphabet = new Alphabet(0, 0, textArray[i], true);
 			money.screenCenter(X);
-			money.y += (i * 60) + 200 + offset;
+			money.y += (i * 40) + 120 + offset;
 			credGroup.push(money);
 			textGroup.push(money);
 			CitroG.state.members.push(money);
@@ -304,7 +342,7 @@ class TitleState extends MusicBeatState
 	function addMoreText(text:String, ?offset:Float = 0) {
 		var coolText:Alphabet = new Alphabet(0, 0, text, true);
 		coolText.screenCenter(X);
-		coolText.y += (textGroup.length * 60) + 200 + offset;
+		coolText.y += (textGroup.length * 40) + 120 + offset;
 		credGroup.push(coolText);
 		textGroup.push(coolText);
 		CitroG.state.members.push(coolText);
@@ -319,16 +357,13 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	private var sickBeats:Int = 0;
-	public static var closedState:Bool = false;
-
 	override function beatHit():Void
 	{
 		super.beatHit();
 
 		if(gfDance != null) {
 			danceLeft = !danceLeft;
-			gfDance.play(danceLeft ? 'danceRight' : 'danceLeft'); // Ensure these anims exist in your .cea
+			gfDance.play(danceLeft ? 'danceRight' : 'danceLeft');
 		}
 
 		if(!closedState) {
@@ -373,8 +408,6 @@ class TitleState extends MusicBeatState
 			}
 		}
 	}
-
-	var skippedIntro:Bool = false;
 
 	function skipIntro():Void
 	{

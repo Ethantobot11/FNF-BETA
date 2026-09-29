@@ -41,7 +41,7 @@ class FlashingState extends MusicBeatState
 					CitroTween.tweenObject(warnText, props, 1, {
 						onComplete: function() {
 							CitroTimer.start(0.5, function() {
-								MusicBeatState.switchState(new TitleState());
+								MusicBeatState.switchState(new options.OptionsState());
 							});
 						}
 					});

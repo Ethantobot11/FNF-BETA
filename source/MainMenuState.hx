@@ -12,6 +12,7 @@ import citro.backend.CitroTween;
 import cpp.UInt32;
 
 using StringTools;
+
 @:headerInclude("3ds.h")
 class MainMenuState extends MusicBeatState
 {
@@ -53,44 +54,46 @@ class MainMenuState extends MusicBeatState
 		
 		var bg:CitroSprite = new CitroSprite(-80, 0);
         bg.loadGraphic(Paths.image('menuBG'));
-		bg.scale.set(1.175, 1.175);
+		bg.scale.set(0.35, 0.35);
 		bg.screenCenter();
 		CitroG.state.members.push(bg);
 
 		magenta = new CitroSprite(-80, 0);
         magenta.loadGraphic(Paths.image('menuBG'));
-		magenta.scale.set(1.175, 1.175);
+		magenta.scale.set(0.35, 0.35);
 		magenta.screenCenter();
 		magenta.visible = false;
 		magenta.color = 0xFFfd719b;
 		CitroG.state.members.push(magenta);
 
-		var scale:Float = 1;
+		var scale:Float = 0.35; // Scaled for 3DS
 
 		for (i in 0...optionShit.length)
 		{
-			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
+			var offset:Float = 40 - (Math.max(optionShit.length, 4) - 4) * 20;
 			var menuItem:MenuOption = new MenuOption(Paths.cea('mainmenu/menu_' + optionShit[i]));
 			menuItem.id = i;
 			menuItem.x = 0;
-			menuItem.y = (i * 140) + offset;
+			menuItem.y = (i * 55) + offset;
 			menuItem.scale.set(scale, scale);
 			menuItem.play('idle');
 			menuItem.screenCenter(X);
 			
-			var scr:Float = (optionShit.length - 4) * 0.135;
+			var scr:Float = (optionShit.length - 4) * 0.05;
 			if(optionShit.length < 6) scr = 0;
 			
 			menuItems.push(menuItem);
 			CitroG.state.members.push(menuItem);
 		}
 
-		var versionShit:CitroText = new CitroText(12, 240 - 44, "Psych Engine v" + psychEngineVersion);
+		var versionShit:CitroText = new CitroText(5, 240 - 15, "Psych v" + psychEngineVersion);
 		versionShit.alignment = LEFT;
+		versionShit.scale.set(0.4, 0.4);
 		CitroG.state.members.push(versionShit);
 		
-		var versionShit2:CitroText = new CitroText(12, 240 - 24, "Friday Night Funkin' v" + psychEngineVersion); // Fallback version
+		var versionShit2:CitroText = new CitroText(5, 240 - 6, "FNF v" + psychEngineVersion);
 		versionShit2.alignment = LEFT;
+		versionShit2.scale.set(0.4, 0.4);
 		CitroG.state.members.push(versionShit2);
 
 		changeItem();
@@ -138,7 +141,7 @@ class MainMenuState extends MusicBeatState
 			{
 				if (optionShit[curSelected] == 'donate')
 				{
-					// CitroG.openURL('https://ninja-muffin24.itch.io/funkin'); // If implemented in CitroG
+					// CitroG.openURL('https://ninja-muffin24.itch.io/funkin');
 				}
 				else
 				{
@@ -230,7 +233,7 @@ class MainMenuState extends MusicBeatState
 				spr.play('selected');
 				var add:Float = 0;
 				if(menuItems.length > 4) {
-					add = menuItems.length * 8;
+					add = menuItems.length * 3;
 				}
 				targetCamX = spr.x + (spr.width * spr.scale.x) / 2;
 				targetCamY = spr.y + (spr.height * spr.scale.y) / 2 - add;

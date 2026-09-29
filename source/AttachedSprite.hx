@@ -1,13 +1,13 @@
 package;
 
-import citro.object.CitroObject;
 import citro.object.CitroSprite;
+import citro.object.CitroObject;
 
 using StringTools;
 
-class AttachedSprite extends CitroObject
+class AttachedSprite extends CitroSprite
 {
-	public var sprTracker:CitroObject;
+	public var sprTracker:CitroObject; 
 	public var xAdd:Float = 0;
 	public var yAdd:Float = 0;
 	public var angleAdd:Float = 0;
@@ -17,17 +17,13 @@ class AttachedSprite extends CitroObject
 	public var copyAlpha:Bool = true;
 	public var copyVisible:Bool = false;
 
-	private var sprite:CitroSprite;
-
-	public function new(?file:String = null)
+	public function new(?file:String = null, ?anim:String = null, ?library:String = null, ?loop:Bool = false)
 	{
-		super();
+		super(0, 0);
 		if(file != null) {
-			sprite = new CitroSprite(0, 0);
-			sprite.loadGraphic(Paths.image(file));
-			sprite.antialiasing = ClientPrefs.globalAntialiasing;
-			this.addChild(sprite);
+			this.loadGraphic(Paths.image(file));
 		}
+		this.antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	override public function update():Bool
