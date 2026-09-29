@@ -40,13 +40,10 @@ class Paths {
 		if (library != null) return getLibraryPath(file, library);
 
 		if (currentLevel != null) {
-			var levelPath:String = '';
 			if(currentLevel != 'shared') {
-				levelPath = getLibraryPathForce(file, currentLevel);
-				return levelPath;
+				return getLibraryPathForce(file, currentLevel);
 			}
-			levelPath = getLibraryPathForce(file, "shared");
-			return levelPath;
+			return getLibraryPathForce(file, "shared");
 		}
 		return getPreloadPath(file);
 	}
@@ -77,7 +74,7 @@ class Paths {
 	static public function video(key:String):String {
 		#if MODS_ALLOWED
 		var file:String = modsVideo(key);
-		return file;
+		if (FileSystem.exists(file)) return file;
 		#end
 		return 'romfs:/assets/videos/$key.$VIDEO_EXT';
 	}
@@ -111,7 +108,7 @@ class Paths {
 	static public function cea(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/$key.cea');
-		return ceaPath;
+		if (FileSystem.exists(ceaPath)) return ceaPath;
 		#end
 		return getPath('images/$key.cea', "TEXT", library);
 	}
@@ -119,7 +116,7 @@ class Paths {
 	static public function animateAtlas(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var ceaPath = modFolders('images/' + key + '/Animation.cea');
-		return ceaPath;
+		if (FileSystem.exists(ceaPath)) return ceaPath;
 		#end
 		return getPath('images/' + key + '/Animation.cea', "TEXT", library);
 	}
@@ -139,33 +136,35 @@ class Paths {
 		} catch(e:Dynamic) {}
 
 		if (currentLevel != null) {
-			var levelPath:String = '';
 			if(currentLevel != 'shared') {
-				levelPath = getLibraryPathForce(key, currentLevel);
 				try {
-					return File.getContent(levelPath);
+					return File.getContent(getLibraryPathForce(key, currentLevel));
 				} catch(e:Dynamic) {}
 			}
-			levelPath = getLibraryPathForce(key, 'shared');
 			try {
-				return File.getContent(levelPath);
+				return File.getContent(getLibraryPathForce(key, 'shared'));
 			} catch(e:Dynamic) {}
 		}
 		#end
 		
-		trace("Warning: Text file not found, returning empty JSON: " + key);
+		trace("Warning: Text file not found: " + key);
 		return "{}"; 
 	}
 
-	inline static public function font(key:String):String {
+	static public function font(key:String):String {
 		#if MODS_ALLOWED
 		var file:String = modsFont(key);
-		return file;
+		if (FileSystem.exists(file)) return file;
 		#end
 		return 'romfs:/assets/fonts/$key';
 	}
 
 	inline static public function fileExists(key:String, type:String, ?ignoreMods:Bool = false, ?library:String):Bool {
+		#if MODS_ALLOWED
+		if(FileSystem.exists(mods(currentModDirectory + '/' + key)) || FileSystem.exists(mods(key))) {
+			return true;
+		}
+		#end
 		return true;
 	}
 
@@ -179,7 +178,9 @@ class Paths {
 	public static function returnGraphicPath(key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var modKey:String = modsImages(key);
-		return modKey;
+		if (FileSystem.exists(modKey)) {
+			return modKey;
+		}
 		#end
 		
 		return getPath('images/$key.t3x', "IMAGE", library);
@@ -188,7 +189,9 @@ class Paths {
 	public static function returnSoundPath(path:String, key:String, ?library:String):String {
 		#if MODS_ALLOWED
 		var file:String = modsSounds(path, key);
-		return file;
+		if (FileSystem.exists(file)) {
+			return file;
+		}
 		#end
 		return getPath('$path/$key.$SOUND_EXT', "SOUND", library);
 	}

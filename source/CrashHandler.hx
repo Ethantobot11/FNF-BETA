@@ -21,6 +21,7 @@ class CrashHandler {
 
     public static function init() {
         try {
+            if (!FileSystem.exists("sdmc:/FNF-PE")) FileSystem.createDirectory("sdmc:/FNF-PE");
             if (!FileSystem.exists(logsDir)) FileSystem.createDirectory(logsDir);
             if (!FileSystem.exists(crashDir)) FileSystem.createDirectory(crashDir);
 
