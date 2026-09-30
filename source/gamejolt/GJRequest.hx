@@ -22,7 +22,7 @@ class GJRequest {
 	}
 
 	function get_url():String {
-		return sign('https://api.gamejolt.com/api/game/v1_2${parseType(call)}');
+		return sign('http://api.gamejolt.com/api/game/v1_2${parseType(call)}');
 	}
 
 	public function set_call(value:RequestType):RequestType {
