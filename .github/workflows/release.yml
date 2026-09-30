@@ -39,7 +39,7 @@ jobs:
         include:
           - name: Nintendo 3DS
             os: ubuntu-latest
-            buildArgs: "3ds -D haxe3ds -D final"
+            buildArgs: "3ds -D haxe3ds -D final -Dn o_ssl"
             artifactName: 3DSBuild
             artifactPath: "buildFiles/*.cia"
          # - name: Wii U
