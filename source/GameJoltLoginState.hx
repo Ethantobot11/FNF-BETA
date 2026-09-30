@@ -11,8 +11,8 @@ import gamejolt.GJRequest;
 import gamejolt.types.RequestType;
 import haxe3ds.services.HID;
 import haxe3ds.services.HID.HIDKey;
-import haxe3ds.applet.SWKBDHandler;
-import haxe3ds.applet.SWKBDType;
+import haxe3ds.applet.SWKBD.SWKBDHandler;
+import haxe3ds.applet.SWKBD.SWKBDType;
 
 @:headerInclude("3ds.h")
 class GameJoltLoginState extends MusicBeatState

@@ -24,13 +24,13 @@ class FlashingState extends MusicBeatState
 		var bg:CitroSprite = new CitroSprite().makeGraphic(400, 240, CitroColor.BLACK);
 		CitroG.state.members.push(bg);
 
-		warnText = new CitroText(0, 0, "WARNING!\nFlashing lights ahead!\n\nPress A to disable\nPress B to ignore", true);
+		warnText = new CitroText(0, 0, "WARNING!\nFlashing lights ahead!\n\nPress A to disable\nPress B to ignore");
 		warnText.alignment = CENTER;
 		warnText.screenCenter(XY);
 		warnText.y -= 20;
 		CitroG.state.members.push(warnText);
 
-		gjHintText = new CitroText(0, 210, "Press [L] for GameJolt Login", false);
+		gjHintText = new CitroText(0, 210, "Press [L] for GameJolt Login");
 		gjHintText.alignment = CENTER;
 		gjHintText.screenCenter(X);
 		gjHintText.color = CitroColor.GRAY;

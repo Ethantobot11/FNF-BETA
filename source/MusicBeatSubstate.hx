@@ -63,7 +63,7 @@ class MusicBeatSubstate extends CitroSubState
 			if (response.success && response.trophies != null) {
 				trace("Successfully fetched " + response.trophies.length + " trophies!");
 				
-				for (trophy in response.trophies) {
+				for (trophy in cast(response.trophies, Array<Trophy>)) {
 					if (trophy.achieved != false) {
 						trace("UNLOCKED: " + trophy.title + " (ID: " + trophy.id + ")");
 					} else {
