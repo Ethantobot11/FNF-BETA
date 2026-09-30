@@ -14,7 +14,12 @@ import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
-import citro.backend.CitroTween.CitroEase; 
+import citro.backend.CitroTween.CitroEase;
+
+import gamejolt.GameJolt;
+import gamejolt.GJRequest;
+import gamejolt.types.RequestType;
+import gamejolt.formats.Trophy;
 
 import haxe.Json;
 import sys.FileSystem;

@@ -6,6 +6,7 @@ import haxe3ds.services.GFX;
 import haxe3ds.services.misc.PLGLDR;
 import citro.CitroGame;
 import citro.object.CitroText;
+import gamejolt.GameJolt;
 
 using StringTools;
 @:headerInclude("3ds.h")
@@ -23,8 +24,12 @@ class Main
     public static function main():Void
     {
         #if haxe3ds
+
         RomFS.init();
         CrashHandler.init();
+
+        GameJolt.gameID = 1103524;
+        GameJolt.gameKey = "b1fa691d4d6afa7b4c1b2d0d305fa44f";
 
         var plgResult = PLGLDR.init();
         if (plgResult == 0) {

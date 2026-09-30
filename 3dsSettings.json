@@ -8,13 +8,14 @@
 		"libraries": [
 			"haxe3ds",
 			"libcwav",
-			"libncsnd"
+			"libncsnd",
+			"gamejolt"
 		],
 		"defines": [],
 		"compileAsCIA": true,
 		"optimizations": {
-			"o2Flag": false,
-			"gFlag": false
+			"o2Flag": true,
+			"gFlag": true
 		},
 		"deleteTempFiles": true
 	},

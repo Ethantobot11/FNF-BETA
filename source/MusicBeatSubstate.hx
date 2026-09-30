@@ -4,6 +4,10 @@ import citro.state.CitroSubState;
 import citro.CitroG;
 import Controls;
 import PlayerSettings;
+import gamejolt.GameJolt;
+import gamejolt.GJRequest;
+import gamejolt.types.RequestType;
+import gamejolt.formats.Trophy;
 
 class MusicBeatSubstate extends CitroSubState
 {
@@ -43,6 +47,69 @@ class MusicBeatSubstate extends CitroSubState
 	}
 
 	public function beatHit():Void {}
+
+	function loadTrophies():Void {
+		GameJolt.userName = CitroG.save.data.gamejolt.username;
+		GameJolt.userToken = CitroG.save.data.gamejolt.token;
+
+		if (GameJolt.userName == "" || GameJolt.userToken == "") {
+			trace("Cannot fetch trophies: User not logged in.");
+			return;
+		}
+
+		var req = new GJRequest(RequestType.TROPHIES_FETCH());
+		
+		req.onComplete = function(response) {
+			if (response.success && response.trophies != null) {
+				trace("Successfully fetched " + response.trophies.length + " trophies!");
+				
+				for (trophy in response.trophies) {
+					if (trophy.achieved != false) {
+						trace("UNLOCKED: " + trophy.title + " (ID: " + trophy.id + ")");
+					} else {
+						trace("LOCKED: " + trophy.title + " (ID: " + trophy.id + ")");
+					}
+				}
+			} else {
+				trace("Failed to fetch trophies: " + response.message);
+			}
+		};
+
+		req.onError = function(error) {
+			trace("Network error fetching trophies: " + error);
+		};
+
+		req.send(true);
+	}
+
+	function unlockTrophy(trophyID:Int):Void {
+		GameJolt.userName = CitroG.save.data.gamejolt.username;
+		GameJolt.userToken = CitroG.save.data.gamejolt.token;
+
+		if (GameJolt.userName == "" || GameJolt.userToken == "") {
+			trace("Cannot unlock trophy: User not logged in.");
+			return;
+		}
+
+		var req = new GJRequest(RequestType.TROPHIES_ADD(trophyID));
+		
+		req.onComplete = function(response) {
+			if (response.success) {
+				trace("SUCCESS: Trophy " + trophyID + " unlocked!");
+				SoundPlayer.playSound(Paths.sound('confirmMenu'));
+			} else {
+				trace("FAILED to unlock trophy: " + response.message);
+			}
+			req.destroy();
+		};
+
+		req.onError = function(error) {
+			trace("NETWORK ERROR unlocking trophy: " + error);
+			req.destroy();
+		};
+
+		req.send(true);
+	}
 
 	public function closeSub():Void {
 		if (CitroG.substate != null) {

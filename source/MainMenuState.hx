@@ -8,6 +8,8 @@ import citro.object.CitroText;
 import citro.math.CitroMath;
 import citro.backend.CitroColor;
 import citro.backend.CitroTween;
+import haxe3ds.services.HID;
+import haxe3ds.services.HID.HIDKey;
 
 import cpp.UInt32;
 
@@ -16,8 +18,9 @@ using StringTools;
 @:headerInclude("3ds.h")
 class MainMenuState extends MusicBeatState
 {
-	public static var psychEngineVersion:String = '0.6.2';
+	public static var psychEngineVersion:String = '0.6.3';
 	public static var curSelected:Int = 0;
+	var gjHintText:CitroText;
 
 	var menuItems:Array<MenuOption> = [];
 	
@@ -44,6 +47,10 @@ class MainMenuState extends MusicBeatState
 		Paths.pushGlobalMods();
 		#end
 		WeekData.loadTheFirstEnabledMod();
+
+		loadTrophies();
+
+		unlockTrophy("313080");
 
 		debugKeys = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1'));
 
@@ -96,6 +103,12 @@ class MainMenuState extends MusicBeatState
 		versionShit2.scale.set(0.4, 0.4);
 		CitroG.state.members.push(versionShit2);
 
+		gjHintText = new CitroText(0, 210, "Press [L] for GameJolt Login", false);
+		gjHintText.alignment = CENTER;
+		gjHintText.screenCenter(X);
+		gjHintText.color = CitroColor.GRAY;
+		CitroG.state.members.push(gjHintText);
+
 		changeItem();
 
 		super.create();
@@ -114,6 +127,11 @@ class MainMenuState extends MusicBeatState
 		for (item in menuItems) {
             item.x = item.x - (camFollowX - CitroG.WIDTH / 2) * 0.05;
             item.y = item.y - (camFollowY - CitroG.HEIGHT / 2) * 0.05;
+		}
+
+		if (HID.keyPressed(HIDKey.L)) {
+				MusicBeatState.switchState(new GameJoltLoginState());
+				return;
 		}
 
 		if (!selectedSomethin)
