@@ -96,7 +96,7 @@ class CitroGame {
 
 			untyped __cpp__('
 				C2D_Flush();
-				C3D_FrameEnd(0);
+				C3D_FrameEnd(1);
 			');
 
 			var elapsed = OS.time.toInt() - startTime;
