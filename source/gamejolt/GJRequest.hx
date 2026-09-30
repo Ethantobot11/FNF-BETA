@@ -68,7 +68,7 @@ class GJRequest {
 				if (t.image_url.startsWith('https://m.'))
 					newUrl = '${t.image_url.substring(0, 37)}1000${t.image_url.substr(40)}'.replace(".jpg", ".png").replace(".webp", ".png");
 				else {
-					newUrl = "https://s.gjcdn.net/assets/";
+					newUrl = "http://s.gjcdn.net/assets/";
 					newUrl += switch (t.image_url.substring(24).replace(".jpg", "").replace(".webp", "")) {
 						case "trophy-bronze-1": "9c2c91d0";
 						case "trophy-silver-1": "b46e352e";
