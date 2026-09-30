@@ -32,7 +32,7 @@ class GameJoltLoginState extends MusicBeatState
         bg = new CitroSprite().makeGraphic(400, 240, CitroColor.BLACK);
         CitroG.state.members.push(bg);
 
-        titleText = new CitroText(0, 30, "GameJolt Login", true);
+        titleText = new CitroText(0, 30, "GameJolt Login");
         titleText.alignment = CENTER;
         titleText.screenCenter(X);
         CitroG.state.members.push(titleText);
@@ -43,7 +43,7 @@ class GameJoltLoginState extends MusicBeatState
 
         updateStatusText();
 
-        backText = new CitroText(0, 210, "[B] Back to Warning", false);
+        backText = new CitroText(0, 210, "[B] Back to MenuState");
         backText.alignment = CENTER;
         backText.screenCenter(X);
         backText.color = CitroColor.GRAY;
@@ -59,13 +59,13 @@ class GameJoltLoginState extends MusicBeatState
         var savedToken = CitroG.save.data.gamejolt.token;
 
         if (savedUser != "" && savedToken != "") {
-            statusText = new CitroText(0, 80, "Logged in as: " + savedUser, false);
+            statusText = new CitroText(0, 80, "Logged in as: " + savedUser);
             statusText.color = CitroColor.GREEN;
-            infoText = new CitroText(0, 120, "Press A to Re-Authenticate\nPress Y to Clear Credentials\nPress B to go back", false);
+            infoText = new CitroText(0, 120, "Press A to Re-Authenticate\nPress Y to Clear Credentials\nPress B to go back");
         } else {
-            statusText = new CitroText(0, 80, "Status: Not Logged In", false);
+            statusText = new CitroText(0, 80, "Status: Not Logged In");
             statusText.color = CitroColor.RED;
-            infoText = new CitroText(0, 120, "Press A to Set Credentials\nPress B to go back", false);
+            infoText = new CitroText(0, 120, "Press A to Set Credentials\nPress B to go back");
         }
         
         statusText.alignment = CENTER;

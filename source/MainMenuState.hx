@@ -103,7 +103,7 @@ class MainMenuState extends MusicBeatState
 		versionShit2.scale.set(0.4, 0.4);
 		CitroG.state.members.push(versionShit2);
 
-		gjHintText = new CitroText(0, 210, "Press [L] for GameJolt Login", false);
+		gjHintText = new CitroText(0, 210, "Press [L] for GameJolt Login");
 		gjHintText.alignment = CENTER;
 		gjHintText.screenCenter(X);
 		gjHintText.color = CitroColor.GRAY;

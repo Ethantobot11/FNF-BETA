@@ -139,7 +139,8 @@ class MusicBeatState extends CitroState {
 			if (response.success && response.trophies != null) {
 				trace("Successfully fetched " + response.trophies.length + " trophies!");
 				
-				for (trophy in cast(response.trophies, Array<Trophy>)) {
+			if (response.trophies != null) {
+				for (trophy in response.trophies) {
 					if (trophy.achieved != false) {
 						trace("UNLOCKED: " + trophy.title + " (ID: " + trophy.id + ")");
 					} else {
@@ -155,7 +156,7 @@ class MusicBeatState extends CitroState {
 			trace("Network error fetching trophies: " + error);
 		};
 
-		req.send(true);
+		req.send();
 	}
 
 	function unlockTrophy(trophyID:Int):Void {
@@ -181,10 +182,10 @@ class MusicBeatState extends CitroState {
 
 		req.onError = function(error) {
 			trace("NETWORK ERROR unlocking trophy: " + error);
-			req.destroy();
+			//req.destroy();
 		};
 
-		req.send(true);
+		req.send();
 	}
 
     public function closeSubState():Void {
