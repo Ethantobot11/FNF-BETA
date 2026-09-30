@@ -140,7 +140,7 @@ class MusicBeatState extends CitroState {
 				trace("Successfully fetched " + response.trophies.length + " trophies!");
 				
 				for (trophy in response.trophies) {
-					if (trophy.achieved != false) {
+					if (trophy.achieved != "false") {
 						trace("UNLOCKED: " + trophy.title + " (ID: " + trophy.id + ")");
 					} else {
 						trace("LOCKED: " + trophy.title + " (ID: " + trophy.id + ")");

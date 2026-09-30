@@ -171,6 +171,6 @@ class GameJoltLoginState extends MusicBeatState
             isAuthenticating = false;
         };
 
-        req.send(true);
+        req.send();
     }
 }
