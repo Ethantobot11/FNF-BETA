@@ -51,6 +51,7 @@ class MainMenuState extends MusicBeatState
 		loadTrophies();
 
 		unlockTrophy(313080);
+		unlockTrophy(313096);
 
 		debugKeys = ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1'));
 
