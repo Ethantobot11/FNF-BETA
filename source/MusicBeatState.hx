@@ -8,6 +8,7 @@ import gamejolt.GameJolt;
 import gamejolt.GJRequest;
 import gamejolt.types.RequestType;
 import gamejolt.formats.Trophy;
+
 @:headerInclude("3ds.h")
 class MusicBeatState extends CitroState {
     public var persistentUpdate:Bool = true;
@@ -27,7 +28,6 @@ class MusicBeatState extends CitroState {
 
 	override public function create():Void {
 		super.create();
-		// Custom fade transitions should be handled via CitroSprite overlays or CitroTween
 	}
 
 	override public function update(delta:Int):Void {
@@ -139,7 +139,6 @@ class MusicBeatState extends CitroState {
 			if (response.success && response.trophies != null) {
 				trace("Successfully fetched " + response.trophies.length + " trophies!");
 				
-			if (response.trophies != null) {
 				for (trophy in response.trophies) {
 					if (trophy.achieved != false) {
 						trace("UNLOCKED: " + trophy.title + " (ID: " + trophy.id + ")");
@@ -177,12 +176,10 @@ class MusicBeatState extends CitroState {
 			} else {
 				trace("FAILED to unlock trophy: " + response.message);
 			}
-			req.destroy();
 		};
 
 		req.onError = function(error) {
 			trace("NETWORK ERROR unlocking trophy: " + error);
-			//req.destroy();
 		};
 
 		req.send();
