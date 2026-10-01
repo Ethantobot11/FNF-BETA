@@ -6,6 +6,7 @@ import haxe3ds.services.GFX;
 import haxe3ds.services.misc.PLGLDR;
 import citro.CitroGame;
 import citro.object.CitroText;
+import citro.CitroG;
 import gamejolt.GameJolt;
 
 using StringTools;
@@ -40,6 +41,10 @@ class Main
         }
         
         trace("Starting FNF 3DS Application...");
+
+        if (CitroG.save.data == null) {
+            CitroG.save.data = {};
+        }
 
         ClientPrefs.loadDefaultKeys();
         try {
