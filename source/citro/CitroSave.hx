@@ -76,12 +76,12 @@ class CitroSave {
 			return;
 		}
 
-		if (FileSystem.exists('sdmc:/FNF-BETA/saves/save.json')) {
+		if (FileSystem.exists('sdmc:/FNF-PE/saves/save.json')) {
 			try {
-				data = Json.parse(File.getContent('sdmc:/FNF-BETA/saves/save.json'));
+				data = Json.parse(File.getContent('sdmc:/FNF-PE/saves/save.json'));
 			} catch(error) {
 				trace('FS Failed to mount try again ig?');
-				FileSystem.deleteFile('sdmc:/FNF-BETA/saves/save.json');
+				FileSystem.deleteFile('sdmc:/FNF-PE/saves/save.json');
 			}
 		}
 
@@ -101,7 +101,7 @@ class CitroSave {
 		try {
 			#if IS_CIA
 			trace('FS Is avaible on cias...but on 3dsx idk bro???');
-			File.saveContent("sdmc:/FNF-BETA/saves/save.json", Json.stringify(data));
+			File.saveContent("sdmc:/FNF-PE/saves/save.json", Json.stringify(data));
 			FS.flushAndCommit();
 			#end
 			return true;
@@ -125,7 +125,7 @@ class CitroSave {
 		}
 
 		try {
-			FileSystem.deleteFile("sdmc:/FNF-BETA/saves/save.json");
+			FileSystem.deleteFile("sdmc:/FNF-PE/saves/save.json");
 			trace('noooo goodbye!!!!');
 			return true;
 		} catch(_) {
