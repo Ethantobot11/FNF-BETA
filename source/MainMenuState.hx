@@ -48,6 +48,11 @@ class MainMenuState extends MusicBeatState
 		#end
 		WeekData.loadTheFirstEnabledMod();
 
+		if (!TitleState.initialized) {
+			SoundPlayer.preload(Paths.music('freakyMenu'));
+			SoundPlayer.playSound(Paths.music('freakyMenu'));
+		}
+
 		loadTrophies();
 
 		unlockTrophy(313080);
