@@ -9,6 +9,8 @@ import sys.FileSystem;
 import citro.CitroG;
 import citro.state.CitroState;
 
+using StringTools;
+
 class CrashHandler {
     private static var logsDir:String = "sdmc:/FNF-PE/logs";
     private static var crashDir:String = "sdmc:/FNF-PE/crash";
