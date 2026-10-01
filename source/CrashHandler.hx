@@ -13,7 +13,7 @@ class CrashHandler {
     private static var logsDir:String = "sdmc:/FNF-PE/logs";
     private static var crashDir:String = "sdmc:/FNF-PE/crash";
     
-    private static var logPath:String = "sdmc:/FNF-PE/logs/game_log.txt";
+    private static var logPath:String = "";
     private static var crashPath:String = "sdmc:/FNF-PE/crash/latest_crash.txt";
     
     private static var originalTrace:Dynamic;
@@ -21,12 +21,17 @@ class CrashHandler {
 
     public static function init() {
         try {
-            if (!FileSystem.exists("sdmc:/FNF-PE")) FileSystem.createDirectory("sdmc:/FNF-PE");
             if (!FileSystem.exists(logsDir)) FileSystem.createDirectory(logsDir);
             if (!FileSystem.exists(crashDir)) FileSystem.createDirectory(crashDir);
 
-            logOutput = File.append(logPath, false);
-            logOutput.writeString("\n--- Citro Engine 3DS Session Started: " + Date.now().toString() + " ---\n");
+            var logIndex:Int = 1;
+            while (FileSystem.exists('sdmc:/FNF-PE/logs/game_log-$logIndex.txt')) {
+                logIndex++;
+            }
+            logPath = 'sdmc:/FNF-PE/logs/game_log-$logIndex.txt';
+
+            logOutput = File.write(logPath, false);
+            logOutput.writeString("--- Citro Engine 3DS Session Started: " + Date.now().toString() + " ---\n");
             logOutput.flush();
         } catch (e:Dynamic) {
             Sys.println("CRITICAL: Failed to initialize CrashHandler files: " + e);
@@ -65,12 +70,23 @@ class CrashHandler {
     }
 
     public static function logException(e:Dynamic, ?customMessage:String = "") {
-        var stack = CallStack.toString(CallStack.exceptionStack());
+        var callStack = CallStack.exceptionStack();
+        var errMsg = "";
+        
+        for (stackItem in callStack) {
+            switch (stackItem) {
+                case FilePos(s, file, line, column):
+                    errMsg += file + " (line " + line + ")\n";
+                default:
+                    errMsg += Std.string(stackItem) + "\n";
+            }
+        }
+
         var fullLog = '\n========================================\n';
         fullLog += '[CRASH/ERROR] ${Date.now().toString()}\n';
         fullLog += 'Message: $customMessage\n';
         fullLog += 'Exception: $e\n';
-        fullLog += 'CallStack:\n$stack\n';
+        fullLog += 'CallStack:\n$errMsg\n';
         fullLog += '========================================\n';
 
         try {
@@ -78,11 +94,21 @@ class CrashHandler {
             file.writeString(fullLog);
             file.flush();
             file.close();
+            
+            var dateNow = Date.now().toString().replace(" ", "_").replace(":", "-");
+            var uniqueCrashPath = 'sdmc:/FNF-PE/crash/crash_$dateNow.txt';
+            var uniqueFile = File.write(uniqueCrashPath, false);
+            uniqueFile.writeString(fullLog);
+            uniqueFile.flush();
+            uniqueFile.close();
+            
         } catch (err:Dynamic) {
             Sys.println("Failed to write crash file: " + err);
         }
 
         appendGeneralLog(fullLog);
+        
+        Sys.println(fullLog);
     }
 
     public static function protect(action:Void->Void, ?fallbackState:CitroState) {
