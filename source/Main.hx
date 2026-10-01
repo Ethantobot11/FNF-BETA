@@ -41,10 +41,15 @@ class Main
         
         trace("Starting FNF 3DS Application...");
 
-        //AchievementManager.unlock("play_DELTARUNE_3DS");
-
         ClientPrefs.loadDefaultKeys();
-        CitroGame.start(new TitleState());
+        try {
+            CitroGame.start(new TitleState());
+        } catch (e:Dynamic) {
+            CrashHandler.logException(e, "Uncaught Fatal Exception in Main Game Loop!");
+            
+            trace("Game crashed fatally. Check sdmc:/FNF-PE/crash/ for details.");
+            Sys.exit(1); 
+        }
         
         #else
         LfEngine.initEngine("FNF 3DS", DRC, new WiiUMainMenuState());
