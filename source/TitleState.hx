@@ -103,6 +103,9 @@ class TitleState extends MusicBeatState
 		try {
 		    var jsonContent:String = Paths.getTextFromFile('images/gfDanceTitle.json');
 		    var parsedJSON:TitleData = Json.parse(jsonContent);
+		    if (parsedJSON.titlex == null) {
+		        throw "JSON parsed but missing required fields (file likely missing)";
+		    }
 		    
 		    var scaleX = 400 / 1280;
 		    var scaleY = 240 / 720;
@@ -118,6 +121,7 @@ class TitleState extends MusicBeatState
 		        bpm: parsedJSON.bpm
 		    };
 		} catch(e:Dynamic) {
+		    trace("WARNING: Using 3DS fallback title coordinates. Reason: " + e);
 		    titleJSON = {
 		        titlex: 200,
 		        titley: 30,
@@ -128,7 +132,6 @@ class TitleState extends MusicBeatState
 		        backgroundSprite: "",
 		        bpm: 102
 		    };
-		    trace("Using 3DS fallback title coordinates");
 		}
 
 		#if TITLE_SCREEN_EASTER_EGG
