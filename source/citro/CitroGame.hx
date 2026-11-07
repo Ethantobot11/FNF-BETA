@@ -35,22 +35,20 @@ class CitroGame {
 	static function renderObjectsForScreen(state:CitroState, bottom:Bool) {
 		for (member in state.members) {
 			if (member == null) continue;
-			
 			if (member.isDestroyed) {
 				state.members.remove(member);
 				continue;
 			}
-
 			if (member.bottom != bottom) continue;
-			member.update();
+			member.update(); 
 		}
 	}
 
 	static function renderState(state:CitroState) {
-		for (i in 0...2) {
-			untyped __cpp__("C2D_SceneBegin({0} == 0 ? topScreen : bottomScreen)", i);
-			renderObjectsForScreen(state, i == 1);
-		}
+		untyped __cpp__("C2D_SceneBegin(topScreen)");
+		renderObjectsForScreen(state, false);
+		untyped __cpp__("C2D_SceneBegin(bottomScreen)");
+		renderObjectsForScreen(state, true);
 	}
 
 	public static function start(state:CitroState) {
@@ -62,7 +60,7 @@ class CitroGame {
 		RomFS.init();
 
 		untyped __cpp__('
-			C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+			C2D_Init(20000); 
 			C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 			C2D_Prepare();
 
@@ -82,6 +80,7 @@ class CitroGame {
 
 			CitroTween.update();
 			CitroTimer.update();
+			CitroG.sound.update();
 			CitroG.state.update(CitroG.deltaTime);
 
 			final sub = CitroG.substate;
@@ -96,7 +95,7 @@ class CitroGame {
 
 			untyped __cpp__('
 				C2D_Flush();
-				C3D_FrameEnd(1);
+				C3D_FrameEnd(0);
 			');
 
 			var elapsed = OS.time.toInt() - startTime;

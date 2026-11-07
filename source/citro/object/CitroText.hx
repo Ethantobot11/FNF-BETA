@@ -119,11 +119,11 @@ class CitroText extends CitroObject {
 		', this.scale);
 	}
 
-	/**
+		/**
 	 * Updates and draws the text.
 	 */
 	override function update():Bool {
-		if (text.length == 0 || super.update()) {
+		if (text.length == 0 || !super.update()) {
 			return false;
 		}
 

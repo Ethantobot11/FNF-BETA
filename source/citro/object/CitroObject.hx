@@ -127,6 +127,11 @@ class CitroObject {
 	public var isDestroyed(default, null):Bool = false;
 
 	/**
+	 * Whether this object currently exists and should be updated/rendered.
+	 */
+	public var exists:Bool = true;
+
+	/**
 	 * Current scale for the current object.
 	 */
 	public var scale:CitroVector2D = new CitroVector2D();
@@ -161,6 +166,7 @@ class CitroObject {
 	 */
 	public function destroy() {
 		isDestroyed = true;
+		exists = false;
 		acceleration = null;
 		scale = null;
 	}
@@ -170,6 +176,8 @@ class CitroObject {
 	 * @return `false` if sprite can be rendered, true if cannot.
 	 */
 	public function update():Bool {
+		if (isDestroyed) return false;
+
 		x += acceleration.x;
 		y += acceleration.y;
 		angle += acceleration.angle;
@@ -197,11 +205,11 @@ class CitroObject {
 	 * @return true if currently visible in screen, false if not visible or not in screen, useful if you don't want it render offscreen to save CPU cycles.
 	 */
 	public function isOnScreen():Bool {
-		if (!visible || alpha <= 0) return false; 
-
-		return x - (width * scale.x) > 0 &&
-			   x < (bottom ? 320 : 400) &&
-			   y - (height * scale.y) > 0 &&
-			   y < 240;
-	}
+        if (!visible || alpha <= 0) return false; 
+        if (scale == null) return false; 
+        return x + (width * scale.x) > 0 &&
+               x < (bottom ? 320 : 400) &&
+               y + (height * scale.y) > 0 &&
+               y < 240;
+    }
 }

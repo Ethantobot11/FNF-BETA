@@ -6,72 +6,78 @@ import citro.CitroG.VoidPtr;
 #include <cwav.h>
 #include <citro2d.h>
 void SUPER_FREE(void **ptr2ptr) {
-	if (ptr2ptr && *ptr2ptr) {
-		free(*ptr2ptr);
-		*ptr2ptr = NULL;
-	}
+    if (ptr2ptr && *ptr2ptr) {
+        free(*ptr2ptr);
+        *ptr2ptr = NULL;
+    }
 }')
-
-@:cppFileCode('
-#include <cwav.h>
-')
 class CitroCache {
-	public var cache:Map<String, VoidPtr> = [];
+    public var cache:Map<String, VoidPtr> = new Map();
+    public var meta:Map<String, Int> = new Map();
 
-	public function new() {}
+    public function new() {}
 
-	public function get(path:String):VoidPtr {
-		if (cache.exists(path)) {
-			return cache[path];
-		}
-		return null;
-	}
+    public function exists(path:String):Bool {
+        return cache.exists(path);
+    }
 
-	public function set(path:String, ptr:VoidPtr) {
-		if (cache.exists(path)) {
-			var _ptr = cache[path];
-			if (ptr == _ptr) {
-				return;
-			}
-			freeMemory(path);
-		}
-		cache[path] = ptr;
-	}
+    public function get(path:String):VoidPtr {
+        return cache.get(path);
+    }
 
-	public function remove(path:String) {
-		if (cache.exists(path)) {
-			freeMemory(path);
-			cache.remove(path);
-		}
-	}
+    public function set(path:String, ptr:VoidPtr) {
+        if (cache.exists(path)) {
+            freeMemory(path);
+        }
+        cache.set(path, ptr);
+    }
 
-	public function keyValueIterator() {
-		return cache.keyValueIterator();
-	}
+    public function getMeta(path:String):Null<Int> {
+        return meta.get(path);
+    }
 
-	function freeMemory(key:String) {
-		final ptr = cache[key];
-		untyped __cpp__('if (!{0}) return', ptr);
+    public function setMeta(path:String, value:Int) {
+        meta.set(path, value);
+    }
 
-		var extension = key.split(".");
-		var ext = extension[extension.length - 1].toLowerCase();
-		
-		switch (ext) {
-			case "t3x":
-				untyped __cpp__('C2D_SpriteSheetFree((C2D_SpriteSheet)ptr);');
-			case "bcfnt":
-				untyped __cpp__('C2D_FontFree((C2D_Font)ptr);');
-			case "cwav":
-				untyped __cpp__('cwavFileFree((CWAV*){0}); free({0});', ptr);
-			default:
-				untyped __cpp__('SUPER_FREE((void**)&ptr)');
-		}
-	}
+    public function remove(path:String) {
+        if (cache.exists(path)) {
+            freeMemory(path);
+        }
+    }
 
-	public function clear() {
-		for (key in cache.keys()) {
-			freeMemory(key);
-		}
-		cache.clear();
-	}
+    public function keyValueIterator() {
+        return cache.keyValueIterator();
+    }
+
+    function freeMemory(key:String) {
+        final ptr = cache[key];
+        untyped __cpp__('if (!{0}) return', ptr);
+        var extension = key.split(".");
+        var ext = extension[extension.length - 1].toLowerCase();
+        switch (ext) {
+            case "t3x":
+                untyped __cpp__('C2D_SpriteSheetFree((C2D_SpriteSheet){0});', ptr);
+            case "bcfnt":
+                untyped __cpp__('C2D_FontFree((C2D_Font){0});', ptr);
+            case "cwav":
+                untyped __cpp__('cwavFileFree((CWAV*){0}); free({0});', ptr);
+            default:
+                untyped __cpp__('SUPER_FREE((void**)&{0})', ptr);
+        }
+        cache.remove(key);
+        meta.remove(key);
+    }
+
+    public function clear() {
+        var keys = [];
+        for (key in cache.keys()) {
+            keys.push(key);
+        }
+        for (key in keys) {
+            freeMemory(key);
+        }
+        cache.clear();
+        meta.clear();
+    }
 }

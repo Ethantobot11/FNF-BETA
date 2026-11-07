@@ -3,21 +3,21 @@ package citro;
 #if (!wiiu || !cafe)
 
 import citro.backend.CitroCache;
+import citro.backend.CitroSoundSystem;
 import citro.backend.CitroTimer;
 import citro.backend.CitroTween;
+import citro.object.CitroCamera;
 import citro.math.CitroRandom;
 import citro.object.CitroObject;
 import citro.state.CitroState;
 import citro.state.CitroSubState;
-
 import cpp.Star;
-
 import haxe3ds.applet.WebBrowser;
 import haxe3ds.services.FS;
 import haxe3ds.services.HID;
 import haxe3ds.types.Result;
 
-extern abstract VoidPtr(Star<Void>) {}
+extern abstract VoidPtr(cpp.Star<Void>) {}
 
 /**
  * The main class for all of your Game Utility Needs and Handlings.
@@ -86,6 +86,18 @@ class CitroG {
 	 * TODO: Maybe free them if it hasn't been used in a certain period of time?
 	 */
 	public static var caches:CitroCache = new CitroCache();
+
+	/**
+     * Global sound manager, similar to FlxG.sound in HaxeFlixel.
+     * Use this to load and play sounds globally.
+     * Example: CitroG.sound.play("romfs:/assets/sounds/select.cwav");
+     */
+    public static var sound:CitroSoundSystem = new CitroSoundSystem();
+
+	/**
+     * what it's a camera idk how to explain it bruh : currently unused
+     */
+    //public static var camera:CitroCamera = new CitroCamera();
 
 	/**
 	 * Function to check if both of the objects are overlapping or not.
