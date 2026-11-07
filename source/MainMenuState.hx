@@ -71,10 +71,12 @@ class MainMenuState extends MusicBeatState
 		bg.screenCenter();
 		CitroG.state.members.push(bg);
 
-		magenta = new CitroSprite(-80, 0);
-        magenta.loadGraphic(Paths.image('menuBG'));
-		magenta.scale.set(0.35, 0.35);
-		magenta.screenCenter();
+		var bg:CitroSprite = new CitroSprite(-80, 0);
+		if (!bg.loadGraphic(Paths.image('menuBG'))) {
+			trace("❌ ERROR: Failed to load menuBG! Check if this file exists: " + Paths.image('menuBG'));
+		}
+		bg.scale.set(0.35, 0.35);
+		bg.screenCenter();
 		magenta.visible = false;
 		magenta.color = 0xFFfd719b;
 		CitroG.state.members.push(magenta);
@@ -272,5 +274,9 @@ class MenuOption extends CitroAnimate
 	
 	public function new(ceaFile:String) {
 		super(ceaFile);
+
+		if (this.atlasSprite == null || this.atlasSprite.totalFrames == 0) {
+			trace("❌ ERROR: MenuOption failed to load CEA: " + ceaFile);
+		}
 	}
 }
